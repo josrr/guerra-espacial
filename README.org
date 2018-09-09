@@ -1,0 +1,38 @@
+#+TITLE: GUERRA-ESPACIAL
+
+This project is intendent to be a Spacewar! clone. For now is only a clone of
+Peter Samson's Expensive Planetarium.
+
+The starfield data is taken from
+[[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][=stars_by_prs_for_sw2b_mar62.txt=]]
+
+You can play an emulated version of Spacewar! and known more facts about this
+game in the series of articles
+[[https://www.masswerk.at/spacewar/inside/][Inside Spacewar!]]
+
+To run the game, clone this repository in your Quicklisp =local-projects= directory, then:
+
+#+BEGIN_SRC
+$ sbcl
+This is SBCL 1.4.11, an implementation of ANSI Common Lisp.
+More information about SBCL is available at <http://www.sbcl.org/>.
+
+SBCL is free software, provided as is, with absolutely no warranty.
+It is mostly in the public domain; some portions are provided under
+BSD-style licenses.  See the CREDITS and COPYING files in the
+distribution for more information.
+* (ql:quickload "guerra-espacial")
+To load "guerra-espacial":
+  Load 1 ASDF system:
+    guerra-espacial
+; Loading "guerra-espacial"
+..............
+("guerra-espacial")
+* (guerra-espacial:main)
+#+END_SRC
+
+* Screenshot
+
+#+CAPTION: Screenshot
+#+NAME:   fig:sc01
+[[./guerra-espacial.png]]
