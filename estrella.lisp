@@ -11,7 +11,8 @@
                             :constelacion (fifth e)
                             :magnitud (car grupo)))
                     (cdr grupo)))
-          (with-open-file (stream #P"datos-estrellas.lisp" :direction :input)
+          (with-open-file (stream (merge-pathnames #P"./datos-estrellas.lisp"
+                                                   *ruta-del-sistema*) :direction :input)
             (read stream))))
 
 (defun estrellas-max-x (estrellas)

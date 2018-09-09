@@ -7,7 +7,7 @@
 (defparameter *pausa* 0.03d0)
 (defparameter *desp-x* (/ (* *pausa* 8192) (* 24 60 60)))
 (defparameter *bloqueo* (bt:make-lock "Bloqueo de espacio-x"))
-
+(defparameter *ruta-del-sistema* (asdf:component-pathname (asdf:find-system 'guerra-espacial)))
 
 (defun dibuja-estrellas (pane max-x)
   (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
