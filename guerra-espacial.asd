@@ -1,5 +1,5 @@
 (asdf:defsystem #:guerra-espacial
-  :description "Space War! clone"
+  :description "Spacewar! clone"
   :author "José Miguel Ronquillo Rivera <jose@rufina.link>"
   :license  "GPL Ver. 3"
   :version "0.0.1"
