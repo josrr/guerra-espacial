@@ -36,3 +36,12 @@ To load "guerra-espacial":
 #+CAPTION: Screenshot
 #+NAME:   fig:sc01
 [[./guerra-espacial.png]]
+
+
+* Credits
+
+Spacewar! was conceived in 1961 by Martin Graetz, Stephen Russell, and Wayne
+Wiitanen. It was first realized on the PDP-1 in 1962 by Stephen Russell, Peter
+Samson, Dan Edwards, and Martin Graetz, together with Alan Kotok, Steve Piner,
+and Robert A Saunders. Spacewar! is in the public domain, but this credit
+paragraph must accompany all distributed versions of the program.
