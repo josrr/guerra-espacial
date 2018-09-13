@@ -21,12 +21,13 @@
                (dibuja-estrellas pane *ancho-mapa-estelar*)
                (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
                (loop for obj in (espacio-naves pane) do
-                    (funcall (getf obj :func) pane obj)
-                    (setf (getf obj :controles) nil)))))
+                    (funcall (getf obj :func) pane obj)))))
          (sleep *pausa*))))
 
-(defun main ()
-  (bt:make-thread #'inicia :name "guesp"))
+(defun main (&rest arguments)
+  (declare (ignore arguments))
+  (let ((hilo (bt:make-thread #'inicia :name "guesp")))
+    (bt:join-thread hilo)))
 
 
 (defclass espacio-pane (climi::never-repaint-background-mixin basic-gadget)
@@ -59,23 +60,11 @@
 
 ;;(defparameter *paso-angular* (/ pi 30.0d0))
 
-(defmethod handle-event ((gadget espacio-pane) (evento key-release-event))
-  (when *application-frame*
-    (case (keyboard-event-key-name evento)
-      ((:Q :|q|) (execute-frame-command *application-frame* `(com-salir)))
-      ((:|a| :|A|) (quita-control-nave gadget :ot2 :izq))
-      ((:|d| :|D|) (quita-control-nave gadget :ot2 :der))
-      ((:|s| :|S|) (quita-control-nave gadget :ot2 :empuje))
-      ((:|w| :|W|) (quita-control-nave gadget :ot2 :fuego))
-      ((:|j| :|J|) (quita-control-nave gadget :ot1 :izq))
-      ((:|l| :|L|) (quita-control-nave gadget :ot1 :der))
-      ((:|k| :|K|) (quita-control-nave gadget :ot1 :empuje))
-      ((:|i| :|I|) (quita-control-nave gadget :ot1 :fuego)))))
-
 (defmethod handle-event ((gadget espacio-pane) (evento key-press-event))
   (when *application-frame*
     (with-slots (escenario) *application-frame*
       (case (keyboard-event-key-name evento)
+        ((:Q :|q|) (execute-frame-command *application-frame* `(com-salir)))
         ((:|a| :|A|) (agrega-control-nave gadget :ot2 :izq))
         ((:|d| :|D|) (agrega-control-nave gadget :ot2 :der))
         ((:|s| :|S|) (agrega-control-nave gadget :ot2 :empuje))
@@ -84,6 +73,18 @@
         ((:|l| :|L|) (agrega-control-nave gadget :ot1 :der))
         ((:|k| :|K|) (agrega-control-nave gadget :ot1 :empuje))
         ((:|i| :|I|) (agrega-control-nave gadget :ot1 :fuego))))))
+
+(defmethod handle-event ((gadget espacio-pane) (evento key-release-event))
+  (when *application-frame*
+    (case (keyboard-event-key-name evento)
+      ((:|a| :|A|) (quita-control-nave gadget :ot2 :izq))
+      ((:|d| :|D|) (quita-control-nave gadget :ot2 :der))
+      ((:|s| :|S|) (quita-control-nave gadget :ot2 :empuje))
+      ((:|w| :|W|) (quita-control-nave gadget :ot2 :fuego))
+      ((:|j| :|J|) (quita-control-nave gadget :ot1 :izq))
+      ((:|l| :|L|) (quita-control-nave gadget :ot1 :der))
+      ((:|k| :|K|) (quita-control-nave gadget :ot1 :empuje))
+      ((:|i| :|I|) (quita-control-nave gadget :ot1 :fuego)))))
 
 ;;;; Comandos
 (define-guerra-espacial-command (com-salir :name "salir" :menu t)
@@ -95,3 +96,6 @@
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
     (setf (espacio-naves espacio) (carga-naves *naves*))))
 
+
+(defun guerra-espacial-entry-point ()
+  (apply 'main *command-line-arguments*))

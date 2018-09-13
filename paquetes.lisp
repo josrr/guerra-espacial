@@ -4,5 +4,7 @@
   (:nicknames :guesp)
   (:use #:clim
         #:clim-lisp
-        #:mcclim-raster-image)
-  (:export #:main))
+        #:mcclim-raster-image
+        #:uiop)
+  (:export #:main
+           #:guerra-espacial-entry-point))
