@@ -58,6 +58,20 @@
   (bt:make-thread (anima frame) :name "Animación"))
 
 ;;(defparameter *paso-angular* (/ pi 30.0d0))
+
+(defmethod handle-event ((gadget espacio-pane) (evento key-release-event))
+  (when *application-frame*
+    (case (keyboard-event-key-name evento)
+      ((:Q :|q|) (execute-frame-command *application-frame* `(com-salir)))
+      ((:|a| :|A|) (quita-control-nave gadget :ot2 :izq))
+      ((:|d| :|D|) (quita-control-nave gadget :ot2 :der))
+      ((:|s| :|S|) (quita-control-nave gadget :ot2 :empuje))
+      ((:|w| :|W|) (quita-control-nave gadget :ot2 :fuego))
+      ((:|j| :|J|) (quita-control-nave gadget :ot1 :izq))
+      ((:|l| :|L|) (quita-control-nave gadget :ot1 :der))
+      ((:|k| :|K|) (quita-control-nave gadget :ot1 :empuje))
+      ((:|i| :|I|) (quita-control-nave gadget :ot1 :fuego)))))
+
 (defmethod handle-event ((gadget espacio-pane) (evento key-press-event))
   (when *application-frame*
     (with-slots (escenario) *application-frame*
@@ -69,8 +83,7 @@
         ((:|j| :|J|) (agrega-control-nave gadget :ot1 :izq))
         ((:|l| :|L|) (agrega-control-nave gadget :ot1 :der))
         ((:|k| :|K|) (agrega-control-nave gadget :ot1 :empuje))
-        ((:|i| :|I|) (agrega-control-nave gadget :ot1 :fuego))
-        ((:Q :|q|) (execute-frame-command *application-frame* `(com-salir)))))))
+        ((:|i| :|I|) (agrega-control-nave gadget :ot1 :fuego))))))
 
 ;;;; Comandos
 (define-guerra-espacial-command (com-salir :name "salir" :menu t)

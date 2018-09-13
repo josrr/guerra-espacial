@@ -155,3 +155,8 @@
 (defun agrega-control-nave (gadget nombre-nave control)
   (let ((nave (dame-nave gadget nombre-nave)))
     (push control (getf nave :controles))))
+
+(defun quita-control-nave (gadget nombre-nave control)
+  (let ((nave (dame-nave gadget nombre-nave)))
+    (setf (getf nave :controles)
+          (remove control (getf nave :controles)))))
