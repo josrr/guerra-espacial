@@ -3,5 +3,6 @@
 (defpackage #:guerra-espacial
   (:nicknames :guesp)
   (:use #:clim
-        #:clim-lisp)
+        #:clim-lisp
+        #:mcclim-raster-image)
   (:export #:main))
