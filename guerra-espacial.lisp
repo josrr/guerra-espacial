@@ -20,7 +20,7 @@
                (declare (ignore wtf-wtf-wtf))
                (dibuja-estrellas pane *ancho-mapa-estelar*)
                (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
-               (loop for obj in (espacio-naves pane)
+               (loop for obj in (append (espacio-naves pane) (espacio-torpedos pane))
                   if (not (null (getf obj :func))) do
                     (funcall (getf obj :func) pane obj)))))
          (sleep *pausa*))))
@@ -37,7 +37,8 @@
    (fondo :initform +black+
           :reader espacio-color-de-fondo)
    (estrellas :initform *estrellas* :reader espacio-estrellas)
-   (naves :initform (carga-naves *naves*) :accessor espacio-naves)))
+   (naves :initform (carga-naves *naves*) :accessor espacio-naves)
+   (torpedos :initform nil :accessor espacio-torpedos)))
 
 (defmethod compose-space ((pane espacio-pane) &key width height)
   (declare (ignore width height))
@@ -95,7 +96,8 @@
 (define-guerra-espacial-command (com-reiniciar :name "Reiniciar" :menu t)
     ()
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
-    (setf (espacio-naves espacio) (carga-naves *naves*))))
+    (setf (espacio-naves espacio) (carga-naves *naves*)
+          (espacio-torpedos espacio) nil)))
 
 
 (defun guerra-espacial-entry-point ()
