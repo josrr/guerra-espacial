@@ -21,9 +21,9 @@
 (defparameter *ancho-mapa-estelar* 8192)
 
 
-(declaim (type double-float *radio-estrella* *2pi* *aceleracion-angular-nave*))
+(declaim (type double-float *radio-estrella* *2pi* *aceleracion-angular-nave* *aceleracion-nave*))
 (defparameter *radio-estrella* 10.0d0)
 (defparameter *2pi* (* 2.0d0 pi))
 (defparameter *aceleracion-angular-nave* (/ (* 8.0d0 pi) 51472.0d0))
-(defparameter *aceleracion-nave* 16)
+(defparameter *aceleracion-nave* 16.0d0)
 (defparameter *paso-nave* 2)

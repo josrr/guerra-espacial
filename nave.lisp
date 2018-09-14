@@ -24,8 +24,8 @@
          (dy (the double-float (getf obj :dy)))
          (x (+ x0 (/ dx 8.0d0)))
          (y (+ y0 (/ dy 8.0d0))))
-    (setf (getf obj :y) x
-          (getf obj :x) y))
+    (setf (getf obj :y) y
+          (getf obj :x) x))
   (toroidalizar obj))
 
 (defun explosion (pane obj)
@@ -51,7 +51,7 @@
     (if (< t1 *radio-estrella*)
         (progn
           (setf (getf nave :dx) 0.0d0
-                (getf nave :dx) 0.0d0
+                (getf nave :dy) 0.0d0
                 (getf nave :colisiona) nil
                 (getf nave :contador) 32
                 (getf nave :func) #'explosion)
@@ -62,12 +62,11 @@
 
 (defun empuje-nave (nave aceleracion)
   (declare (optimize (speed 3) (safety 0))
-           (type fixnum aceleracion))
+           (type double-float aceleracion))
   (let ((theta (getf nave :theta)))
     (declare (type double-float theta))
-    (values (/ (cos theta) aceleracion)
-            (/ (sin theta) aceleracion)
-            t)))
+    (values (/ (sin theta) aceleracion)
+            (/ (cos theta) aceleracion))))
 
 (defun actualiza-direccion-obj (obj am)
   (declare (optimize (speed 3) (safety 0))
@@ -102,9 +101,8 @@
       (when bx
         (when empuje
           (multiple-value-bind (d-bx d-by) (empuje-nave nave *aceleracion-nave*)
-            (incf by d-bx)
-            (decf bx d-by)
-            (setf empuje t)))
+            (incf by d-by)
+            (decf bx d-bx)))
         (incf (getf nave :dy) by)
         (incf (getf nave :dx) bx)
         (actualiza-posicion-obj nave)))
