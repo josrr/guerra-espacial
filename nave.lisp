@@ -1,69 +1,113 @@
 (in-package #:guerra-espacial)
 
-(defun toroidalizar (obj)
-  (let ((x (getf obj :x))
-        (y (getf obj :y)))
-    (if (< x *min-x*)
-        (incf (getf obj :x) *ancho*)
-        (when (> x *max-x*)
-          (decf (getf obj :x) *ancho*)))
-    (if (< y *min-y*)
-        (incf (getf obj :y) *alto*)
-        (when (> y *max-y*)
-          (decf (getf obj :y) *alto*)))))
+(declaim (inline toroidalizar actualiza-posicion-obj actualiza-direccion-obj
+                 actualiza-mom-angular gravedad empuje-nave))
 
-(defun explosion (pane nave)
-  t)
+(defun toroidalizar (obj)
+  (declare (optimize (speed 3) (safety 0)))
+  (let ((x (the double-float (getf obj :x)))
+        (y (the double-float (getf obj :y))))
+    (if (< x *min-x*)
+        (setf (getf obj :x) (+ x *ancho-df*))
+        (when (> x *max-x*)
+          (setf (getf obj :x) (- x *ancho-df*))))
+    (if (< y *min-y*)
+        (setf (getf obj :y) (+ y *alto-df*))
+        (when (> y *max-y*)
+          (setf (getf obj :y) (- y *alto-df*))))))
+
+(defun actualiza-posicion-obj (obj)
+  (declare (optimize (speed 3) (safety 0)))
+  (let* ((x0 (the double-float (getf obj :x)))
+         (y0 (the double-float (getf obj :y)))
+         (dx (the double-float (getf obj :dx)))
+         (dy (the double-float (getf obj :dy)))
+         (x (+ x0 (/ dx 8.0d0)))
+         (y (+ y0 (/ dy 8.0d0))))
+    (setf (getf obj :y) x
+          (getf obj :x) y))
+  (toroidalizar obj))
+
+(defun explosion (pane obj)
+  (actualiza-posicion-obj obj)
+  (let ((x (+ 512.0d0 (the double-float (getf obj :x))))
+        (y (- 512.0d0 (the double-float (getf obj :y)))))
+    (loop for m from (floor (getf obj :tamaño) 8) downto 1
+       for factor double-float = (/ (random 256.0d0) (if (> m 96) 2.0d0 8.0d0)) do
+         (draw-point* pane
+                      (+ x (* 2.0d0 factor (- (random 1.0d0) 0.5d0)))
+                      (+ y (* 2.0d0 factor (- (random 1.0d0) 0.5d0)))
+                      :ink +white+ :line-thickness 3)))
+  (when (zerop (decf (getf obj :contador)))
+    (setf (getf obj :func) nil)))
 
 (defun gravedad (nave)
-  (let ((t1 (+ (expt (/ (getf nave :x) 8.0d0) 2.0d0)
-               (expt (/ (getf nave :y) 8.0d0) 2.0d0))))
+  (declare (optimize (speed 3) (safety 0)))
+  (let* ((x (getf nave :x))
+         (y (getf nave :y))
+         (t1 (+ (expt (/ x 8.0d0) 2.0d0)
+                (expt (/ y 8.0d0) 2.0d0))))
+    (declare (type double-float x y t1))
     (if (< t1 *radio-estrella*)
         (progn
           (setf (getf nave :dx) 0.0d0
                 (getf nave :dx) 0.0d0
                 (getf nave :colisiona) nil
-                (getf nave :contador) 8
+                (getf nave :contador) 32
                 (getf nave :func) #'explosion)
           (values))
         (let ((t1 (/ (* t1 (sqrt t1)) 2.0d0)))
-          (values (/ (- (getf nave :x)) t1)
-                  (/ (- (getf nave :y)) t1))))))
+          (values (/ (- x) t1)
+                  (/ (- y) t1))))))
 
 (defun empuje-nave (nave aceleracion)
-  (values (/ (cos (getf nave :theta)) aceleracion)
-          (/ (sin (getf nave :theta)) aceleracion)
-          t))
+  (declare (optimize (speed 3) (safety 0))
+           (type fixnum aceleracion))
+  (let ((theta (getf nave :theta)))
+    (declare (type double-float theta))
+    (values (/ (cos theta) aceleracion)
+            (/ (sin theta) aceleracion)
+            t)))
+
+(defun actualiza-direccion-obj (obj am)
+  (declare (optimize (speed 3) (safety 0))
+           (type double-float am))
+  (let* ((theta (getf obj :theta))
+         (theta1 (+ theta am)))
+    (declare (type double-float theta theta1))
+    (setf (getf obj :theta)
+          (if (> theta1 *2pi*) (- theta1 *2pi*)
+              (if (< theta1 (- *2pi*)) (+ theta1 *2pi*)
+                  theta1)))) )
+
+(defun actualiza-mom-angular (nave am izq der)
+  (declare (optimize (speed 3) (safety 0))
+           (type double-float am))
+  (if izq
+      (incf am *aceleracion-angular-nave*)
+      (when der
+        (decf am *aceleracion-angular-nave*)))
+  (setf (getf nave :mom-angular) am))
 
 (defun mueve-nave (nave)
-  (let* ((am (getf nave :mom-angular))
-         (ctrls (getf nave :controles))
+  (let* ((ctrls (getf nave :controles))
          (izq (member :izq ctrls))
          (der (member :der ctrls))
          (empuje (member :empuje ctrls)))
-    (if izq
-        (incf am *aceleracion-angular-nave*)
-        (when der
-          (decf am *aceleracion-angular-nave*)))
-    (setf (getf nave :mom-angular) am)
-    (let ((theta1 (+ (getf nave :theta) am)))
-      (setf (getf nave :theta)
-            (if (> theta1 *2pi*) (- theta1 *2pi*)
-                (if (< theta1 (- *2pi*)) (+ theta1 *2pi*)
-                    theta1))))
+    (actualiza-direccion-obj nave
+                             (actualiza-mom-angular nave
+                                                    (getf nave :mom-angular)
+                                                    izq der))
     (multiple-value-bind (bx by) (gravedad nave)
-      (unless bx (setf bx 0.0d0
-                       by 0.0d0))
-      (when empuje
-        (multiple-value-bind (d-bx d-by) (empuje-nave nave *aceleracion-nave*)
-          (incf by d-bx)
-          (decf bx d-by)
-          (setf empuje t)))
-      (incf (getf nave :dy) by)
-      (incf (getf nave :y) (/ (getf nave :dy) 8.0d0))
-      (incf (getf nave :dx) bx)
-      (incf (getf nave :x) (/ (getf nave :dx) 8.0d0)))
-    (toroidalizar nave)
+      (when bx
+        (when empuje
+          (multiple-value-bind (d-bx d-by) (empuje-nave nave *aceleracion-nave*)
+            (incf by d-bx)
+            (decf bx d-by)
+            (setf empuje t)))
+        (incf (getf nave :dy) by)
+        (incf (getf nave :dx) bx)
+        (actualiza-posicion-obj nave)))
     (values empuje izq der)))
 
 (defun dame-nave (pane nombre)
@@ -123,8 +167,8 @@
                   (dibuja-nave pane nave empuje izq der (- paso) 1))
                 (return t)))))
     (when empuje (dibuja-gases-nave pane x y sen cos +darkorange+ +white+))
-    (when der    (dibuja-gases-nave pane x y cos (- sen) +snow3+ +white+ 14))
-    (when izq    (dibuja-gases-nave pane x y (- cos) sen +snow3+ +white+ 14))))
+    (when der    (dibuja-gases-nave pane (+ x ssn) (+ y scn) cos (- sen) +snow3+ +white+ 14))
+    (when izq    (dibuja-gases-nave pane (+ x ssn) (+ y scn) (- cos) sen +snow3+ +white+ 14))))
 
 (defun maneja-nave (pane nave)
   (multiple-value-bind (empuje izq der) (mueve-nave nave)
@@ -147,6 +191,7 @@
                     :colisiona t
                     :contador 0
                     :controles nil
+                    :tamaño 1024
                     :desc (loop for palabra in (getf nave :forma) append
                                (loop for v across (format nil "~o" palabra) collect
                                     (- (char-code v) (char-code #\0)))))))

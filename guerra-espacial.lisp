@@ -20,7 +20,8 @@
                (declare (ignore wtf-wtf-wtf))
                (dibuja-estrellas pane *ancho-mapa-estelar*)
                (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
-               (loop for obj in (espacio-naves pane) do
+               (loop for obj in (espacio-naves pane)
+                  if (not (null (getf obj :func))) do
                     (funcall (getf obj :func) pane obj)))))
          (sleep *pausa*))))
 

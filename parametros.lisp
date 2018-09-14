@@ -1,7 +1,10 @@
 (in-package #:guerra-espacial)
 
+(declaim (type double-float *ancho-df* *alto-df*))
 (defparameter *ancho* 1024)
 (defparameter *alto* 1024)
+(defparameter *ancho-df* (coerce *ancho* 'double-float))
+(defparameter *alto-df* (coerce *alto* 'double-float))
 
 (declaim (type double-float *max-x* *max-y* *min-x* *min-y*))
 (defparameter *max-x* (/ *ancho* 2.0d0))
@@ -17,6 +20,8 @@
 (defparameter *desp-x* (/ (* *pausa* 8192) (* 24 60 60)))
 (defparameter *ancho-mapa-estelar* 8192)
 
+
+(declaim (type double-float *radio-estrella* *2pi* *aceleracion-angular-nave*))
 (defparameter *radio-estrella* 10.0d0)
 (defparameter *2pi* (* 2.0d0 pi))
 (defparameter *aceleracion-angular-nave* (/ (* 8.0d0 pi) 51472.0d0))
