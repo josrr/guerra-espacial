@@ -48,7 +48,8 @@
                                  )
                         :line-thickness 4))))
   (when (zerop (decf (the fixnum (getf obj :contador))))
-    (setf (getf obj :func) nil)))
+    (setf (getf obj :func) nil
+          (espacio-objs pane) (remove obj (espacio-objs pane)))))
 
 (defun gravedad (nave)
   (declare (optimize (speed 3) (safety 0)))
@@ -62,7 +63,7 @@
           (setf (getf nave :dx) 0.0d0
                 (getf nave :dy) 0.0d0
                 (getf nave :colisiona) nil
-                (getf nave :contador) 1
+                (getf nave :contador) 24
                 (getf nave :func) #'explosion)
           (values))
         (let ((t1 (/ (* t1 (sqrt t1)) 2.0d0)))
@@ -175,7 +176,6 @@
     (when izq    (dibuja-gases-nave pane (+ x ssn) (+ y scn) (- cos) sen +snow3+ +white+ 14))))
 
 (defun maneja-torpedo (pane torpedo)
-  ;;(log:info torpedo)
   (actualiza-posicion-obj torpedo)
   (let ((x (+ 512.0d0 (getf torpedo :x)))
         (y (- 512.0d0 (getf torpedo :y))))
@@ -183,8 +183,10 @@
     (draw-point* pane x y :ink +white+ :line-thickness 4))
   (if (> (getf torpedo :contador) 0)
       (decf (getf torpedo :contador))
-      (setf (espacio-torpedos pane)
-            (remove torpedo (espacio-torpedos pane)))))
+      (progn
+        (setf
+         (getf torpedo :contador) 16
+         (getf torpedo :func) #'explosion))))
 
 (defun nuevo-torpedo (nave num)
   (list :nombre (alexandria:symbolicate 'torpedo-
@@ -193,21 +195,19 @@
         :func #'maneja-torpedo
         :x (getf nave :x)
         :y (getf nave :y)
-        :dx (* -25.0d0 (sin (getf nave :theta)))
-        :dy (* 25.0d0 (cos (getf nave :theta)))
+        :dx (+ (getf nave :dx) (* -25.0d0 (sin (getf nave :theta))))
+        :dy (+ (getf nave :dy) (* 25.0d0 (cos (getf nave :theta))))
         :mom-angular 0.0d0
         :theta (getf nave :theta)
         :vel-angular 0.0d0
         :colisiona t
         :contador 128
-        :tamaño 1024))
+        :tamaño 256))
 
 (defun dispara-torpedo (pane nave)
   (when (> (getf nave :torpedos) 0)
-    ;;(log:info nave)
     (push (nuevo-torpedo nave (getf nave :torpedos))
-          (espacio-torpedos pane))
-    ;;(log:info (espacio-torpedos pane))
+          (espacio-objs pane))
     (decf (getf nave :torpedos))))
 
 (defun maneja-nave (pane nave)
@@ -215,8 +215,8 @@
     (dibuja-nave pane nave empuje izq der))
   (when (member :fuego (getf nave :controles))
     (dispara-torpedo pane nave)
-    (setf (getf nave :controles)
-          (remove :fuego (getf nave :controles)))))
+    (setf (getf nave :controles) (remove :fuego (getf nave :controles)
+                                         :count 1))))
 
 (defun carga-naves (lista)
   (mapcar (lambda (datos)
@@ -242,7 +242,7 @@
           lista))
 
 (defun dame-nave (pane nombre)
-  (find nombre (espacio-naves pane)
+  (find nombre (espacio-objs pane)
         :key (lambda (n) (getf n :nombre))))
 
 (defun agrega-control-nave (gadget nombre-nave control)
