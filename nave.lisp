@@ -18,12 +18,13 @@
 
 (defun actualiza-posicion-obj (obj)
   (declare (optimize (speed 3) (safety 0)))
-  (let* ((x0 (the double-float (getf obj :x)))
-         (y0 (the double-float (getf obj :y)))
-         (dx (the double-float (getf obj :dx)))
-         (dy (the double-float (getf obj :dy)))
+  (let* ((x0 (getf obj :x))
+         (y0 (getf obj :y))
+         (dx (getf obj :dx))
+         (dy (getf obj :dy))
          (x (+ x0 (/ dx 8.0d0)))
          (y (+ y0 (/ dy 8.0d0))))
+    (declare (type double-float x0 y0 dx dy))
     (setf (getf obj :y) y
           (getf obj :x) x))
   (toroidalizar obj))
