@@ -204,7 +204,11 @@
     (when izq    (dibuja-gases-nave pane (+ x ssn) (+ y scn) (- cos) sen +snow3+ +white+ 14))))
 
 (defun maneja-torpedo (pane torpedo)
-  (actualiza-posicion-obj torpedo)
+  (multiple-value-bind (bx by) (gravedad torpedo)
+    (when bx
+      (incf (getf torpedo :dy) by)
+      (incf (getf torpedo :dx) bx)
+      (actualiza-posicion-obj torpedo)))
   (let ((x (+ 512.0d0 (getf torpedo :x)))
         (y (- 512.0d0 (getf torpedo :y))))
     (draw-point* pane x y :ink +blue+ :line-thickness 7)

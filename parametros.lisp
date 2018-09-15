@@ -23,7 +23,7 @@
 
 (declaim (type double-float *radio-estrella* *2pi* *aceleracion-angular-nave* *aceleracion-nave*
                *gravedad*))
-(defparameter *radio-estrella* 10.0d0)
+(defparameter *radio-estrella* 5.0d0)
 (defparameter *2pi* (* 2.0d0 pi))
 (defparameter *aceleracion-angular-nave* (/ (* 8.0d0 pi) 51472.0d0))
 (defparameter *aceleracion-nave* 16.0d0)
