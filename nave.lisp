@@ -3,6 +3,9 @@
 (declaim (inline toroidalizar actualiza-posicion-obj actualiza-direccion-obj
                  actualiza-mom-angular gravedad empuje-nave))
 
+(defun colisiona-nave (pane nave)
+  )
+
 (defun toroidalizar (obj)
   (declare (optimize (speed 3) (safety 0)))
   (let ((x (getf obj :x))
@@ -210,13 +213,17 @@
           (espacio-objs pane))
     (decf (getf nave :torpedos))))
 
+;;(setf (getf nave :controles) (remove :fuego (getf nave :controles) :count 1))
 (defun maneja-nave (pane nave)
   (multiple-value-bind (empuje izq der) (mueve-nave nave)
     (dibuja-nave pane nave empuje izq der))
-  (when (member :fuego (getf nave :controles))
-    (dispara-torpedo pane nave)
-    (setf (getf nave :controles) (remove :fuego (getf nave :controles)
-                                         :count 1))))
+  (if (and (member :fuego (getf nave :controles))
+           (zerop (getf nave :disparando)))
+      (progn
+        (setf (getf nave :disparando) 5)
+        (dispara-torpedo pane nave))
+      (when (> (getf nave :disparando) 0)
+        (decf (getf nave :disparando)))))
 
 (defun carga-naves (lista)
   (mapcar (lambda (datos)
@@ -236,6 +243,7 @@
                     :contador 0
                     :controles nil
                     :tamaño 1024
+                    :disparando 0
                     :desc (loop for palabra in (getf nave :forma) append
                                (loop for v across (format nil "~o" palabra) collect
                                     (- (char-code v) (char-code #\0)))))))
