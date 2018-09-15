@@ -22,7 +22,13 @@
                (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
                (loop for obj in (espacio-objs pane) ;;(append (espacio-naves pane) (espacio-torpedos pane))
                   if (not (null (getf obj :func))) do
-                    (funcall (getf obj :func) pane obj)))))
+                    (funcall (getf obj :func) pane obj))
+               (multiple-value-bind (obj1 obj2) (hay-colision-p pane)
+                 (when obj1
+                   (setf (getf obj1 :contador) 16
+                         (getf obj1 :func) #'explosion
+                         (getf obj2 :contador) 16
+                         (getf obj2 :func) #'explosion))))))
          (sleep *pausa*))))
 
 (defun main (&rest arguments)

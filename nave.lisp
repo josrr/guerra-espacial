@@ -3,8 +3,32 @@
 (declaim (inline toroidalizar actualiza-posicion-obj actualiza-direccion-obj
                  actualiza-mom-angular gravedad empuje-nave))
 
-(defun colisiona-nave (pane nave)
-  )
+(declaim (type double-float *radio-1* *radio-2*))
+(defparameter *radio-1* 48d0)
+(defparameter *radio-2* 24d0)
+
+(defun hay-colision-p (pane)
+  (declare (optimize (speed 3)))
+  (loop with todos = (remove nil (espacio-objs pane) :key (lambda (o) (getf o :colisiona)))
+     for obj1 in todos
+     for es-nave-1 = (eq :nave (getf obj1 :tipo))
+     and nombre-1 = (getf obj1 :nombre)
+     for x1 double-float = (getf obj1 :x) and y1 double-float = (getf obj1 :y) do
+       (loop with todos-2 = (remove obj1 todos)
+          for obj2 in (if es-nave-1
+                          (remove nombre-1
+                                  todos-2
+                                  :key (lambda (o) (getf (getf o :nave) :nombre)))
+                          (remove (getf (getf obj1 :nave) :nombre)
+                                  todos-2
+                                  :key (lambda (o) (getf o :nombre))))
+          for x2 double-float = (getf obj2 :x)  and y2 double-float = (getf obj2 :y)
+          for dx double-float = (abs (- x2 x1)) and dy double-float = (abs (- y2 y1))
+          if (and (< dx *radio-1*) (< dy *radio-1*)
+                  (< (+ dx dy) *radio-2*))
+          do (return-from hay-colision-p (values obj1 obj2)))
+       (setf todos (remove obj1 todos)))
+  (values))
 
 (defun toroidalizar (obj)
   (declare (optimize (speed 3) (safety 0)))
@@ -192,7 +216,8 @@
          (getf torpedo :func) #'explosion))))
 
 (defun nuevo-torpedo (nave num)
-  (list :nombre (alexandria:symbolicate 'torpedo-
+  (list :tipo :torpedo
+        :nombre (alexandria:symbolicate 'torpedo-
                                         (getf nave :nombre)
                                         '- (princ-to-string num))
         :func #'maneja-torpedo
@@ -204,8 +229,9 @@
         :theta (getf nave :theta)
         :vel-angular 0.0d0
         :colisiona t
-        :contador 128
-        :tamaño 256))
+        :contador 200
+        :tamaño 512
+        :nave nave))
 
 (defun dispara-torpedo (pane nave)
   (when (> (getf nave :torpedos) 0)
@@ -228,7 +254,8 @@
 (defun carga-naves (lista)
   (mapcar (lambda (datos)
             (let ((nave (cadr datos)))
-              (list :nombre (car datos)
+              (list :tipo :nave
+                    :nombre (car datos)
                     :func #'maneja-nave
                     :x (or (getf nave :x) 0.0d0)
                     :y (or (getf nave :y) 0.0d0)
