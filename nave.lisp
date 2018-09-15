@@ -76,6 +76,7 @@
 
 (defun explota-obj (obj)
   (setf (getf obj :contador) 16
+        (getf obj :colisiona) nil
         (getf obj :func) #'explosion))
 
 (defun gravedad (nave)
