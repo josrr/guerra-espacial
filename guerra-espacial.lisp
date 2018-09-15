@@ -71,6 +71,7 @@
     (with-slots (escenario) *application-frame*
       (case (keyboard-event-key-name evento)
         ((:Q :|q|) (execute-frame-command *application-frame* `(com-salir)))
+        ((:R :|r|) (execute-frame-command *application-frame* `(com-reiniciar)))
         ((:|a| :|A|) (agrega-control-nave gadget :ot2 :izq))
         ((:|d| :|D|) (agrega-control-nave gadget :ot2 :der))
         ((:|s| :|S|) (agrega-control-nave gadget :ot2 :empuje))
