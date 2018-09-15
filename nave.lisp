@@ -3,32 +3,28 @@
 (declaim (inline toroidalizar actualiza-posicion-obj actualiza-direccion-obj
                  actualiza-mom-angular gravedad empuje-nave))
 
-(declaim (type double-float *radio-1* *radio-2*))
-(defparameter *radio-1* 48d0)
-(defparameter *radio-2* 24d0)
+(declaim (type double-float *radio-colision-1* *radio-colision-2*))
+(defparameter *radio-colision-1* 48d0)
+(defparameter *radio-colision-2* 24d0)
 
 (defun hay-colision-p (pane)
   (declare (optimize (speed 3)))
-  (loop with todos = (remove nil (espacio-objs pane) :key (lambda (o) (getf o :colisiona)))
-     for obj1 in todos
-     for es-nave-1 = (eq :nave (getf obj1 :tipo))
-     and nombre-1 = (getf obj1 :nombre)
-     for x1 double-float = (getf obj1 :x) and y1 double-float = (getf obj1 :y) do
-       (loop with todos-2 = (remove obj1 todos)
-          for obj2 in (if es-nave-1
-                          (remove nombre-1
-                                  todos-2
-                                  :key (lambda (o) (getf (getf o :nave) :nombre)))
-                          (remove (getf (getf obj1 :nave) :nombre)
-                                  todos-2
-                                  :key (lambda (o) (getf o :nombre))))
-          for x2 double-float = (getf obj2 :x)  and y2 double-float = (getf obj2 :y)
-          for dx double-float = (abs (- x2 x1)) and dy double-float = (abs (- y2 y1))
-          if (and (< dx *radio-1*) (< dy *radio-1*)
-                  (< (+ dx dy) *radio-2*))
-          do (return-from hay-colision-p (values obj1 obj2)))
-       (setf todos (remove obj1 todos)))
-  (values))
+  (loop for todos on (remove nil (espacio-objs pane) :key (lambda (o) (getf o :colisiona)))
+     for obj1 = (car todos)
+     for x1 double-float = (getf obj1 :x) and y1 double-float = (getf obj1 :y)
+     append (remove-duplicates (mapcan (lambda (obj2)
+                                         (let* ((dx (abs (- (the double-float (getf obj2 :x)) x1)))
+                                                (dy (abs (- (the double-float (getf obj2 :y)) y1))))
+                                           (declare (type double-float dx dy))
+                                           (when (and (< dx *radio-colision-1*)
+                                                      (< dy *radio-colision-1*)
+                                                      (< (+ dx dy) *radio-colision-2*))
+                                             (list obj1 obj2))))
+                                       (if (eq :nave (getf obj1 :tipo))
+                                           (remove (getf obj1 :nombre) (cdr todos)
+                                                   :key (lambda (o) (getf (getf o :nave) :nombre)))
+                                           (remove (getf (getf obj1 :nave) :nombre) (cdr todos)
+                                                   :key (lambda (o) (getf o :nombre))))))))
 
 (defun toroidalizar (obj)
   (declare (optimize (speed 3) (safety 0)))
@@ -77,6 +73,10 @@
   (when (zerop (decf (the fixnum (getf obj :contador))))
     (setf (getf obj :func) nil
           (espacio-objs pane) (remove obj (espacio-objs pane)))))
+
+(defun explota-obj (obj)
+  (setf (getf obj :contador) 16
+        (getf obj :func) #'explosion))
 
 (defun gravedad (nave)
   (declare (optimize (speed 3) (safety 0)))
