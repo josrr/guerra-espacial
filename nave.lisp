@@ -21,11 +21,9 @@
                                                       (< dy *radio-colision-1*)
                                                       (< (+ dx dy) *radio-colision-2*))
                                              (list obj1 obj2))))
-                                       (if obj1-es-nave
-                                           (remove (getf obj1 :nombre) (cdr todos)
-                                                   :key (lambda (o) (getf (getf o :nave) :nombre)))
-                                           (remove (getf (getf obj1 :nave) :nombre) (cdr todos)
-                                                   :key (lambda (o) (getf o :nombre))))))))
+                                       ;;(cdr todos)
+                                       (if obj1-es-nave (remove (getf obj1 :nombre) (cdr todos) :key (lambda (o) (getf (getf o :nave) :nombre))) (remove (getf (getf obj1 :nave) :nombre) (cdr todos) :key (lambda (o) (getf o :nombre))))
+                                       ))))
 
 (defun toroidalizar (obj)
   (declare (optimize (speed 3) (safety 0)))
@@ -77,6 +75,8 @@
 
 (defun explota-obj (obj)
   (setf (getf obj :contador) 16
+        (getf obj :dx) 0.0d0
+        (getf obj :dy) 0.0d0
         (getf obj :colisiona) nil
         (getf obj :func) #'explosion))
 
@@ -137,6 +137,7 @@
                                                     (getf nave :mom-angular)
                                                     izq der))
     (multiple-value-bind (bx by) (gravedad nave)
+      (setf bx 0.0d0 by 0.0d0)
       (when bx
         (when empuje
           (multiple-value-bind (d-bx d-by) (empuje-nave nave *aceleracion-nave*)
@@ -206,8 +207,8 @@
                       (getf nave :ym) (/ (+ (- 512d0 y) yo) 2))
                 (return t)))))
     (when empuje (dibuja-gases-nave pane x y sen cos +darkorange+ +white+))
-    (when der    (dibuja-gases-nave pane (+ x ssn) (+ y scn) cos (- sen) +snow3+ +white+ 14))
-    (when izq    (dibuja-gases-nave pane (+ x ssn) (+ y scn) (- cos) sen +snow3+ +white+ 14))))
+    (when der    (dibuja-gases-nave pane (+ x (* 11d0 cos)) (+ y (* -11d0 sen)) cos (- sen) +snow3+ +white+ 14))
+    (when izq    (dibuja-gases-nave pane (+ x (* -11d0 cos)) (+ y (* 11d0 sen)) (- cos) sen +snow3+ +white+ 14))))
 
 (defun maneja-torpedo (pane torpedo)
   (multiple-value-bind (bx by) (gravedad torpedo)
@@ -234,13 +235,13 @@
         :func #'maneja-torpedo
         :x (getf nave :x)
         :y (getf nave :y)
-        :dx (+ (getf nave :dx) (* -25.0d0 (sin (getf nave :theta))))
-        :dy (+ (getf nave :dy) (* 25.0d0 (cos (getf nave :theta))))
+        :dx (+ (getf nave :dx) (* -60.0d0 (sin (getf nave :theta))))
+        :dy (+ (getf nave :dy) (* 60.0d0 (cos (getf nave :theta))))
         :mom-angular 0.0d0
         :theta (getf nave :theta)
         :vel-angular 0.0d0
         :colisiona t
-        :contador 200
+        :contador 80
         :tamaño 512
         :nave nave))
 
