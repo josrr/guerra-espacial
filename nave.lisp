@@ -137,7 +137,6 @@
                                                     (getf nave :mom-angular)
                                                     izq der))
     (multiple-value-bind (bx by) (gravedad nave)
-      (setf bx 0.0d0 by 0.0d0)
       (when bx
         (when empuje
           (multiple-value-bind (d-bx d-by) (empuje-nave nave *aceleracion-nave*)
@@ -207,8 +206,8 @@
                       (getf nave :ym) (/ (+ (- 512d0 y) yo) 2))
                 (return t)))))
     (when empuje (dibuja-gases-nave pane x y sen cos +darkorange+ +white+))
-    (when der    (dibuja-gases-nave pane (+ x (* 11d0 cos)) (+ y (* -11d0 sen)) cos (- sen) +snow3+ +white+ 14))
-    (when izq    (dibuja-gases-nave pane (+ x (* -11d0 cos)) (+ y (* 11d0 sen)) (- cos) sen +snow3+ +white+ 14))))
+    (when der    (dibuja-gases-nave pane (+ x (* 11d0 cos)) (+ y (* -11d0 sen)) cos (- sen) +snow3+ +white+ 6))
+    (when izq    (dibuja-gases-nave pane (+ x (* -11d0 cos)) (+ y (* 11d0 sen)) (- cos) sen +snow3+ +white+ 6))))
 
 (defun maneja-torpedo (pane torpedo)
   (multiple-value-bind (bx by) (gravedad torpedo)
