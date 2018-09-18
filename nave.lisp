@@ -3,24 +3,25 @@
 (declaim (inline toroidalizar actualiza-posicion-obj actualiza-direccion-obj
                  actualiza-mom-angular gravedad empuje-nave))
 
-(declaim (type double-float *radio-colision-1* *radio-colision-2*))
-(defparameter *radio-colision-1* 48d0)
-(defparameter *radio-colision-2* 24d0)
-
 (defun hay-colision-p (pane)
   (declare (optimize (speed 3)))
   (loop for todos on (remove nil (espacio-objs pane) :key (lambda (o) (getf o :colisiona)))
      for obj1 = (car todos)
-     for x1 double-float = (getf obj1 :x) and y1 double-float = (getf obj1 :y)
+     for obj1-es-nave = (eq :nave (getf obj1 :tipo))
+     for x1 double-float = (if obj1-es-nave  (getf obj1 :xm) (getf obj1 :x))
+     and y1 double-float = (if obj1-es-nave (getf obj1 :ym) (getf obj1 :y))
      append (remove-duplicates (mapcan (lambda (obj2)
-                                         (let* ((dx (abs (- (the double-float (getf obj2 :x)) x1)))
-                                                (dy (abs (- (the double-float (getf obj2 :y)) y1))))
-                                           (declare (type double-float dx dy))
+                                         (let* ((obj2-es-nave (eq :nave (getf obj2 :tipo)))
+                                                (x2 (getf obj2 :x))
+                                                (y2 (getf obj2 :y))
+                                                (dx (abs (- (if obj2-es-nave (the double-float (getf obj2 :xm)) x2) x1)))
+                                                (dy (abs (- (if obj2-es-nave (the double-float (getf obj2 :ym)) y2) y1))))
+                                           (declare (type double-float x2 y2 dx dy))
                                            (when (and (< dx *radio-colision-1*)
                                                       (< dy *radio-colision-1*)
                                                       (< (+ dx dy) *radio-colision-2*))
                                              (list obj1 obj2))))
-                                       (if (eq :nave (getf obj1 :tipo))
+                                       (if obj1-es-nave
                                            (remove (getf obj1 :nombre) (cdr todos)
                                                    :key (lambda (o) (getf (getf o :nave) :nombre)))
                                            (remove (getf (getf obj1 :nave) :nombre) (cdr todos)
@@ -166,8 +167,10 @@
   (declare (optimize (speed 3) (safety 0))
            (type fixnum ciclo))
   (let* ((angulo (getf nave :theta))
-         (x (+ 512.0d0 (the double-float (getf nave :x))))
-         (y (- 512.0d0 (the double-float (getf nave :y))))
+         (xo (getf nave :x))
+         (yo (getf nave :y))
+         (x (+ 512.0d0 xo))
+         (y (- 512.0d0 yo))
          (abs-paso (coerce (abs paso) 'double-float))
          (sen (sin angulo))
          (cos (cos angulo))
@@ -179,7 +182,7 @@
          (csn (- ssn scm))
          (ssd (+ scn ssm))
          (csm (- scn ssm)))
-    (declare (type double-float x y ssn scn ssm scm ssc csn ssd csm abs-paso angulo)
+    (declare (type double-float xo yo x y ssn scn ssm scm ssc csn ssd csm abs-paso angulo)
              (type fixnum paso))
     (loop with guardada = nil
        for valor in (getf nave :desc) do
@@ -198,6 +201,9 @@
                     (setf guardada (cons x y))))
              (7 (when (zerop ciclo)
                   (dibuja-nave pane nave empuje izq der (- paso) 1))
+                ;;(when (eq (getf nave :nombre) :ot2) (log:info x y))
+                (setf (getf nave :xm) (/ (+ (- x 512d0) xo) 2)
+                      (getf nave :ym) (/ (+ (- 512d0 y) yo) 2))
                 (return t)))))
     (when empuje (dibuja-gases-nave pane x y sen cos +darkorange+ +white+))
     (when der    (dibuja-gases-nave pane (+ x ssn) (+ y scn) cos (- sen) +snow3+ +white+ 14))
@@ -276,6 +282,8 @@
                     :controles nil
                     :tamaño 1024
                     :disparando 0
+                    :xm 0d0
+                    :ym 0d0
                     :desc (loop for palabra in (getf nave :forma) append
                                (loop for v across (format nil "~o" palabra) collect
                                     (- (char-code v) (char-code #\0)))))))

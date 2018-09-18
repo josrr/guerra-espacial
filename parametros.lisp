@@ -20,7 +20,6 @@
 (defparameter *desp-x* (/ (* *pausa* 8192) (* 24 60 60)))
 (defparameter *ancho-mapa-estelar* 8192)
 
-
 (declaim (type double-float *radio-estrella* *2pi* *aceleracion-angular-nave* *aceleracion-nave*
                *gravedad*))
 (defparameter *radio-estrella* 5.0d0)
@@ -29,3 +28,7 @@
 (defparameter *aceleracion-nave* 16.0d0)
 (defparameter *paso-nave* 2)
 (defparameter *gravedad* (/ 12.0d0))
+
+(declaim (type double-float *radio-colision-1* *radio-colision-2*))
+(defparameter *radio-colision-1* 96d0)
+(defparameter *radio-colision-2* 48d0)

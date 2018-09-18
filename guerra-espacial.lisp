@@ -20,11 +20,10 @@
                (declare (ignore wtf-wtf-wtf))
                (dibuja-estrellas pane *ancho-mapa-estelar*)
                (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
-               (loop for obj in (espacio-objs pane) ;;(append (espacio-naves pane) (espacio-torpedos pane))
+               (loop for obj in (espacio-objs pane)
                   if (not (null (getf obj :func))) do
                     (funcall (getf obj :func) pane obj))
-               (mapcar #'explota-obj
-                       (hay-colision-p pane)))))
+               (mapcar #'explota-obj (hay-colision-p pane)))))
          (sleep *pausa*))))
 
 (defun main (&rest arguments)
