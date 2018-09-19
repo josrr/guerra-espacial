@@ -79,27 +79,27 @@
     (setf (getf obj :func) nil
           (espacio-objs pane) (remove obj (espacio-objs pane)))))
 
-(defun explota-obj (obj)
-  (setf (getf obj :contador) 16
+(defun explota-obj (obj &optional (contador 16))
+  (when (and (eq :nave (getf obj :tipo)))
+    (setf (getf obj :x) (getf obj :xm)
+          (getf obj :y) (getf obj :ym)))
+  (setf (getf obj :contador) (or contador 16)
         (getf obj :dx) 0.0d0
         (getf obj :dy) 0.0d0
         (getf obj :colisiona) nil
         (getf obj :func) #'explosion))
 
-(defun gravedad (nave)
+(defun gravedad (obj)
   (declare (optimize (speed 3) (safety 0)))
-  (let* ((x (getf nave :x))
-         (y (getf nave :y))
+  (let* ((es-nave (and (eq :nave (getf obj :tipo))))
+         (x (getf obj (if es-nave :xm :x)))
+         (y (getf obj (if es-nave :ym :y)))
          (t1 (+ (expt (* x *gravedad*) 2.0d0)
                 (expt (* y *gravedad*) 2.0d0))))
     (declare (type double-float x y t1))
     (if (< t1 *radio-estrella*)
         (progn
-          (setf (getf nave :dx) 0.0d0
-                (getf nave :dy) 0.0d0
-                (getf nave :colisiona) nil
-                (getf nave :contador) 24
-                (getf nave :func) #'explosion)
+          (explota-obj obj 24)
           (values))
         (let ((t1 (/ (* t1 (sqrt t1)) 2.0d0)))
           (values (/ (- x) t1)
@@ -288,8 +288,8 @@
                     :controles nil
                     :tamaño 1024
                     :disparando 0
-                    :xm 0d0
-                    :ym 0d0
+                    :xm (or (getf nave :x) 0.0d0)
+                    :ym (or (getf nave :y) 0.0d0)
                     :desc (loop for palabra in (getf nave :forma) append
                                (loop for v across (format nil "~o" palabra) collect
                                     (- (char-code v) (char-code #\0)))))))
