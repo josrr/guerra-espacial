@@ -19,6 +19,7 @@
 (defparameter *bloqueo-guesp* (bt:make-lock "Bloqueo para el frame"))
 (defparameter *desp-x* (/ (* *pausa* 8192) (* 24 60 60)))
 (defparameter *ancho-mapa-estelar* 8192)
+(defparameter *max-x-mapa-estelar* (1- *ancho-mapa-estelar*))
 
 (declaim (type double-float *radio-estrella* *2pi* *aceleracion-angular-nave* *aceleracion-nave*
                *gravedad*))

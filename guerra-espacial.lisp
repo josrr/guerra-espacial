@@ -18,7 +18,7 @@
            (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
              (climi::with-double-buffering ((pane x0 y0 x1 y1) (wtf-wtf-wtf))
                (declare (ignore wtf-wtf-wtf))
-               (dibuja-estrellas pane *ancho-mapa-estelar*)
+               (dibuja-estrellas pane)
                (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
                (loop for obj in (espacio-objs pane)
                   if (not (null (getf obj :func))) do
