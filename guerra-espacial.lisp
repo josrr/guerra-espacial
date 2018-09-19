@@ -38,10 +38,7 @@
    (fondo :initform +black+
           :reader espacio-color-de-fondo)
    (estrellas :initform *estrellas* :reader espacio-estrellas)
-   ;;(naves :initform (carga-naves *naves*) :accessor espacio-naves)
-   (objetos :initform (carga-naves *naves*) :accessor espacio-objs)
-   ;;(torpedos :initform nil :accessor espacio-torpedos)
-   ))
+   (objetos :initform (carga-naves *naves*) :accessor espacio-objs)))
 
 (defmethod compose-space ((pane espacio-pane) &key width height)
   (declare (ignore width height))
@@ -52,8 +49,6 @@
                           :max-width *ancho*
                           :max-height *alto*))
 
-;;(defmethod handle-repaint ((pane espacio-pane) region) (declare (ignore region)) (dibuja-estrellas pane *ancho-mapa-estelar*))
-
 (define-application-frame
     guerra-espacial () ()
     (:panes (espacio-pane (make-pane 'espacio-pane)))
@@ -63,7 +58,6 @@
 (defmethod run-frame-top-level :before (frame &key &allow-other-keys)
   (bt:make-thread (anima frame) :name "Animación"))
 
-;;(defparameter *paso-angular* (/ pi 30.0d0))
 
 (defmethod handle-event ((gadget espacio-pane) (evento key-press-event))
   (when *application-frame*
@@ -100,9 +94,7 @@
 (define-guerra-espacial-command (com-reiniciar :name "Reiniciar" :menu t)
     ()
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
-    (setf (espacio-objs espacio) (carga-naves *naves*)
-                                        ;(espacio-torpedos espacio) nil
-          )))
+    (setf (espacio-objs espacio) (carga-naves *naves*))))
 
 
 (defun guerra-espacial-entry-point ()

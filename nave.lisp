@@ -21,9 +21,15 @@
                                                       (< dy *radio-colision-1*)
                                                       (< (+ dx dy) *radio-colision-2*))
                                              (list obj1 obj2))))
-                                       ;;(cdr todos)
-                                       (if obj1-es-nave (remove (getf obj1 :nombre) (cdr todos) :key (lambda (o) (getf (getf o :nave) :nombre))) (remove (getf (getf obj1 :nave) :nombre) (cdr todos) :key (lambda (o) (getf o :nombre))))
-                                       ))))
+                                       (if obj1-es-nave
+                                           (remove (getf obj1 :nombre)
+                                                   (cdr todos)
+                                                   :key (lambda (o)
+                                                          (getf (getf o :nave) :nombre)))
+                                           (remove (getf (getf obj1 :nave) :nombre)
+                                                   (cdr todos)
+                                                   :key (lambda (o)
+                                                          (getf o :nombre))))))))
 
 (defun toroidalizar (obj)
   (declare (optimize (speed 3) (safety 0)))
