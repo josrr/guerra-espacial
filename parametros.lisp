@@ -33,3 +33,9 @@
 (declaim (type double-float *radio-colision-1* *radio-colision-2*))
 (defparameter *radio-colision-1* 96d0)
 (defparameter *radio-colision-2* 48d0)
+
+(defparameter *duracion-explosion* 16)
+(defparameter *duracion-torpedos* 120)
+(defparameter *tamaño-torpedos* 512)
+(defparameter *tamaño-nave* 1024)
+(defparameter *numero-de-torpedos* 32)

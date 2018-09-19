@@ -21,15 +21,7 @@
                                                       (< dy *radio-colision-1*)
                                                       (< (+ dx dy) *radio-colision-2*))
                                              (list obj1 obj2))))
-                                       (if obj1-es-nave
-                                           (remove (getf obj1 :nombre)
-                                                   (cdr todos)
-                                                   :key (lambda (o)
-                                                          (getf (getf o :nave) :nombre)))
-                                           (remove (getf (getf obj1 :nave) :nombre)
-                                                   (cdr todos)
-                                                   :key (lambda (o)
-                                                          (getf o :nombre))))))))
+                                       (cdr todos)))))
 
 (defun toroidalizar (obj)
   (declare (optimize (speed 3) (safety 0)))
@@ -79,11 +71,11 @@
     (setf (getf obj :func) nil
           (espacio-objs pane) (remove obj (espacio-objs pane)))))
 
-(defun explota-obj (obj &optional (contador 16))
+(defun explota-obj (obj &optional (contador *duracion-explosion*))
   (when (and (eq :nave (getf obj :tipo)))
     (setf (getf obj :x) (getf obj :xm)
           (getf obj :y) (getf obj :ym)))
-  (setf (getf obj :contador) (or contador 16)
+  (setf (getf obj :contador) (or contador *duracion-explosion*)
         (getf obj :dx) 0.0d0
         (getf obj :dy) 0.0d0
         (getf obj :colisiona) nil
@@ -99,7 +91,7 @@
     (declare (type double-float x y t1))
     (if (< t1 *radio-estrella*)
         (progn
-          (explota-obj obj 24)
+          (explota-obj obj 32)
           (values))
         (let ((t1 (/ (* t1 (sqrt t1)) 2.0d0)))
           (values (/ (- x) t1)
@@ -229,26 +221,28 @@
       (decf (getf torpedo :contador))
       (progn
         (setf
-         (getf torpedo :contador) 16
+         (getf torpedo :contador) *duracion-explosion*
          (getf torpedo :func) #'explosion))))
 
 (defun nuevo-torpedo (nave num)
-  (list :tipo :torpedo
-        :nombre (alexandria:symbolicate 'torpedo-
-                                        (getf nave :nombre)
-                                        '- (princ-to-string num))
-        :func #'maneja-torpedo
-        :x (getf nave :x)
-        :y (getf nave :y)
-        :dx (+ (getf nave :dx) (* -60.0d0 (sin (getf nave :theta))))
-        :dy (+ (getf nave :dy) (* 60.0d0 (cos (getf nave :theta))))
-        :mom-angular 0.0d0
-        :theta (getf nave :theta)
-        :vel-angular 0.0d0
-        :colisiona t
-        :contador 80
-        :tamaño 512
-        :nave nave))
+  (let ((sen (sin (getf nave :theta)))
+        (cos (cos (getf nave :theta))))
+    (list :tipo :torpedo
+          :nombre (alexandria:symbolicate 'torpedo-
+                                          (getf nave :nombre)
+                                          '- (princ-to-string num))
+          :func #'maneja-torpedo
+          :x (+ (getf nave :x) (* -30.0d0 sen))
+          :y (+ (getf nave :y) (* 30.0d0 cos))
+          :dx (+ (getf nave :dx) (* -60.0d0 sen))
+          :dy (+ (getf nave :dy) (* 60.0d0 cos))
+          :mom-angular 0.0d0
+          :theta (getf nave :theta)
+          :vel-angular 0.0d0
+          :colisiona t
+          :contador *duracion-torpedos*
+          :tamaño *tamaño-torpedos*
+          :nave nave)))
 
 (defun dispara-torpedo (pane nave)
   (when (> (getf nave :torpedos) 0)
@@ -282,11 +276,11 @@
                     :theta (or (getf nave :theta) 0.0d0)
                     :vel-angular 0.0d0
                     :combustible 64
-                    :torpedos 4096
+                    :torpedos *numero-de-torpedos*
                     :colisiona t
                     :contador 0
                     :controles nil
-                    :tamaño 1024
+                    :tamaño *tamaño-nave*
                     :disparando 0
                     :xm (or (getf nave :x) 0.0d0)
                     :ym (or (getf nave :y) 0.0d0)
