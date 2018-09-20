@@ -1,2 +1,4 @@
 *~
 bin/*
+*.gif*
+/spacewar-outlines.jpg
