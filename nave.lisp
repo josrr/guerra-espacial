@@ -100,10 +100,8 @@
 (defun empuje-nave (nave aceleracion)
   (declare (optimize (speed 3) (safety 0))
            (type double-float aceleracion))
-  (let ((theta (getf nave :theta)))
-    (declare (type double-float theta))
-    (values (/ (sin theta) aceleracion)
-            (/ (cos theta) aceleracion))))
+  (values (/ (the double-float (getf nave :sen)) aceleracion)
+          (/ (the double-float (getf nave :cos)) aceleracion)))
 
 (defun actualiza-direccion-obj (obj am)
   (declare (optimize (speed 3) (safety 0))
@@ -170,8 +168,8 @@
          (x (+ 512.0d0 xo))
          (y (- 512.0d0 yo))
          (abs-paso (coerce (abs paso) 'double-float))
-         (sen (sin angulo))
-         (cos (cos angulo))
+         (sen (getf nave :sen))
+         (cos (getf nave :cos))
          (ssn (* abs-paso sen))
          (scn (* abs-paso cos))
          (ssm (if (minusp paso) (- ssn) ssn))
@@ -237,6 +235,8 @@
           :dx (+ (getf nave :dx) (* -60.0d0 sen))
           :dy (+ (getf nave :dy) (* 60.0d0 cos))
           :mom-angular 0.0d0
+          :sen sen
+          :cos cos
           :theta (getf nave :theta)
           :vel-angular 0.0d0
           :colisiona t
@@ -252,6 +252,8 @@
 
 ;;(setf (getf nave :controles) (remove :fuego (getf nave :controles) :count 1))
 (defun maneja-nave (pane nave)
+  (setf (getf nave :sen) (sin (getf nave :theta))
+        (getf nave :cos) (cos (getf nave :theta)))
   (multiple-value-bind (empuje izq der) (mueve-nave nave)
     (dibuja-nave pane nave empuje izq der))
   (if (and (member :fuego (getf nave :controles))
@@ -272,6 +274,8 @@
                     :y (or (getf nave :y) 0.0d0)
                     :dx 0.0d0
                     :dy 0.0d0
+                    :sen 0.0d0
+                    :cos 0.0d0
                     :mom-angular 0.0d0
                     :theta (or (getf nave :theta) 0.0d0)
                     :vel-angular 0.0d0
