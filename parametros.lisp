@@ -39,3 +39,4 @@
 (defparameter *tamaño-torpedos* 512)
 (defparameter *tamaño-nave* 1024)
 (defparameter *numero-de-torpedos* 32)
+(defparameter *combustible* 1536)

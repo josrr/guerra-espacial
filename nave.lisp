@@ -134,7 +134,7 @@
                                                     izq der))
     (multiple-value-bind (bx by) (gravedad nave)
       (when bx
-        (when empuje
+        (when (and empuje (> (getf nave :combustible) 0))
           (multiple-value-bind (d-bx d-by) (empuje-nave nave *aceleracion-nave*)
             (incf by d-by)
             (decf bx d-bx)))
@@ -240,8 +240,8 @@
                                           (getf nave :nombre)
                                           '- (princ-to-string num))
           :func #'maneja-torpedo
-          :x x
-          :y y
+          :x (- x sen)
+          :y (+ y cos)
           :dx (+ dx (* -60.0d0 sen))
           :dy (+ dy (* 60.0d0 cos))
           :sen sen
@@ -263,7 +263,11 @@
   (setf (getf nave :sen) (sin (getf nave :theta))
         (getf nave :cos) (cos (getf nave :theta)))
   (multiple-value-bind (empuje izq der) (mueve-nave nave)
-    (dibuja-nave pane nave empuje izq der))
+    (dibuja-nave pane nave (and empuje
+                                (> (getf nave :combustible) 0))
+                 izq der)
+    (when (and empuje (> (getf nave :combustible) 0))
+      (decf (getf nave :combustible))))
   (if (and (member :fuego (getf nave :controles))
            (zerop (getf nave :disparando)))
       (progn
@@ -287,7 +291,7 @@
                     :mom-angular 0.0d0
                     :theta (or (getf nave :theta) 0.0d0)
                     :vel-angular 0.0d0
-                    :combustible 64
+                    :combustible *combustible*
                     :torpedos *numero-de-torpedos*
                     :colisiona t
                     :contador 0
