@@ -1,11 +1,14 @@
 #+TITLE: GUERRA-ESPACIAL
-
+#+OPTIONS: toc:nil
+#+HTML_DOCTYPE: html5
+#+HTML_HEAD: <link rel="stylesheet" href="css/estilo.css" />
+#+HTML_LINK_HOME: https://guerra-espacial.rufina.link/
+#+HTML_LINK_UP: https://guerra-espacial.rufina.link/
 This project is intended to be a Spacewar! clone. The only feature that this
 version continues to lack is the hyperspace jump. The starfield uses the same
 data that Peter Samson's Expensive Planetarium.
 
-The starfield data is taken from
-[[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][stars_by_prs_for_sw2b_mar62.txt]]
+The starfield data is taken from [[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][this file]].
 
 You can play an emulated version of Spacewar! and known more facts about this
 game in the series of articles
@@ -23,37 +26,38 @@ game in the series of articles
 To run the game, clone [[https://github.com/josrr/guerra-espacial][this]] repository in your Quicklisp =local-projects= directory
 
 #+BEGIN_SRC
-$ cd ~/quicklisp/local-projects/
-$ git clone https://github.com/josrr/guerra-espacial.git
+ $ cd ~/quicklisp/local-projects/
+ $ git clone https://github.com/josrr/guerra-espacial.git
 #+END_SRC
 
 then:
 
-#+BEGIN_SRC
-$ sbcl
-This is SBCL 1.4.11, an implementation of ANSI Common Lisp.
-More information about SBCL is available at <http://www.sbcl.org/>.
 
-SBCL is free software, provided as is, with absolutely no warranty.
-It is mostly in the public domain; some portions are provided under
-BSD-style licenses.  See the CREDITS and COPYING files in the
-distribution for more information.
-* (ql:quickload "guerra-espacial")
-To load "guerra-espacial":
+#+BEGIN_SRC
+ $ sbcl
+ This is SBCL 1.4.11, an implementation of ANSI Common Lisp.
+ More information about SBCL is available at <http://www.sbcl.org/>.
+
+ SBCL is free software, provided as is, with absolutely no warranty.
+ It is mostly in the public domain; some portions are provided under
+ BSD-style licenses.  See the CREDITS and COPYING files in the
+ distribution for more information.
+ * (ql:quickload "guerra-espacial")
+ To load "guerra-espacial":
   Load 1 ASDF system:
     guerra-espacial
-; Loading "guerra-espacial"
-..............
-("guerra-espacial")
-* (guerra-espacial:main)
+ ; Loading "guerra-espacial"
+ ..............
+ ("guerra-espacial")
+ * (guerra-espacial:main)
 #+END_SRC
 
 * Generating an executable
 Is posible to generate an executable file, just load =genexe.lisp=:
 
 #+BEGIN_SRC
-$ cd ~/quicklisp/local-projects/guerra-espacial
-$ sbcl --load genexe.lisp
+ $ cd ~/quicklisp/local-projects/guerra-espacial
+ $ sbcl --load genexe.lisp
 #+END_SRC
 
 This must produce the file =./bin/guerra-espacial=.
