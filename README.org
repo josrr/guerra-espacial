@@ -6,8 +6,8 @@
 #+HTML_HEAD_EXTRA: <meta name="Description" content="Spacewar! clone;
 #+HTML_HEAD_EXTRA: written by José M. A. Ronquillo Rivera;
 #+HTML_HEAD_EXTRA: using Common Lisp and McCLIM." />
-#+HTML_LINK_HOME: https://guerra-espacial.rufina.link/
-#+HTML_LINK_UP: https://guerra-espacial.rufina.link/
+#+HTML_LINK_HOME: https://www.guerra-espacial.rufina.link/
+#+HTML_LINK_UP: https://www.guerra-espacial.rufina.link/
 This project is intended to be a Spacewar! clone. The only feature that this
 version continues to lack is the hyperspace jump. The starfield uses the same
 data that Peter Samson's Expensive Planetarium.
@@ -24,7 +24,6 @@ Spacewar!]]
 #+CAPTION: Screenshot
 #+NAME:   fig:sc01
 [[./guerra-espacial.gif]]
-
 
 * How to run the game
 
