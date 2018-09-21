@@ -11,6 +11,13 @@ You can play an emulated version of Spacewar! and known more facts about this
 game in the series of articles
 [[https://www.masswerk.at/spacewar/inside/][Inside Spacewar!]]
 
+* Screenshot
+
+#+CAPTION: Screenshot
+#+NAME:   fig:sc01
+[[./guerra-espacial.gif]]
+
+
 * How to run the game
 
 To run the game, clone [[https://github.com/josrr/guerra-espacial][this]] repository in your Quicklisp =local-projects= directory
@@ -50,6 +57,7 @@ $ sbcl --load genexe.lisp
 #+END_SRC
 
 This must produce the file =./bin/guerra-espacial=.
+
 
 * Credits
 
