@@ -1,7 +1,8 @@
 #+TITLE: GUERRA-ESPACIAL
 
-This project is intendent to be a Spacewar! clone. For now is only a clone of
-Peter Samson's Expensive Planetarium.
+This project is intended to be a Spacewar! clone. The only feature that this
+version continues to lack is the hyperspace jump. The starfield uses the same
+data that Peter Samson's Expensive Planetarium.
 
 The starfield data is taken from
 [[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][stars_by_prs_for_sw2b_mar62.txt]]
@@ -10,7 +11,16 @@ You can play an emulated version of Spacewar! and known more facts about this
 game in the series of articles
 [[https://www.masswerk.at/spacewar/inside/][Inside Spacewar!]]
 
-To run the game, clone this repository in your Quicklisp =local-projects= directory, then:
+* How to run the game
+
+To run the game, clone [[https://github.com/josrr/guerra-espacial][this]] repository in your Quicklisp =local-projects= directory
+
+#+BEGIN_SRC
+$ cd ~/quicklisp/local-projects/
+$ git clone https://github.com/josrr/guerra-espacial.git
+#+END_SRC
+
+then:
 
 #+BEGIN_SRC
 $ sbcl
@@ -31,12 +41,15 @@ To load "guerra-espacial":
 * (guerra-espacial:main)
 #+END_SRC
 
-* Screenshot
+* Generating an executable
+Is posible to generate an executable file, just load =genexe.lisp=:
 
-#+CAPTION: Screenshot
-#+NAME:   fig:sc01
-[[./guerra-espacial.gif]]
+#+BEGIN_SRC
+$ cd ~/quicklisp/local-projects/guerra-espacial
+$ sbcl --load genexe.lisp
+#+END_SRC
 
+This must produce the file =./bin/guerra-espacil=.
 
 * Credits
 
