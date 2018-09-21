@@ -1,8 +1,11 @@
 #+TITLE: GUERRA-ESPACIAL: Spacewar! clone
 #+OPTIONS: toc:nil
 #+HTML_DOCTYPE: html5
-#+HTML_HEAD: <link rel="stylesheet" href="css/estilo.css" />
-#+HTML_HEAD_EXTRA: <link href="favicon.png" rel="icon" type="image/png" />
+#+HTML_HEAD: <link rel="stylesheet" href="css/estilo.css">
+#+HTML_HEAD_EXTRA: <link href="favicon.png" rel="icon" type="image/png">
+#+HTML_HEAD_EXTRA: <meta name="Description" content="Spacewar! clone;
+#+HTML_HEAD_EXTRA: written by José M. A. Ronquillo Rivera;
+#+HTML_HEAD_EXTRA: using Common Lisp and McCLIM." />
 #+HTML_LINK_HOME: https://guerra-espacial.rufina.link/
 #+HTML_LINK_UP: https://guerra-espacial.rufina.link/
 This project is intended to be a Spacewar! clone. The only feature that this
@@ -62,7 +65,7 @@ Is posible to generate an executable file, just load =genexe.lisp=:
  $ sbcl --load genexe.lisp
 #+END_SRC
 
-This must produce the file =./bin/guerra-espacial=. A copy of the executable can be [[https://guerra-espacial.rufina.link/guerra-espacial][downloaded here]].
+This must produce the file =./bin/guerra-espacial=. A copy of the executable can be [[https://rufina.link/guerra-espacial/guerra-espacial][downloaded here]].
 
 * Credits
 
