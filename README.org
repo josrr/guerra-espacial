@@ -1,5 +1,6 @@
 #+TITLE: GUERRA-ESPACIAL: Spacewar! clone
-#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil num:nil
+#+UNNUMBERED: t
 #+HTML_DOCTYPE: html5
 #+HTML_HEAD: <link rel="stylesheet" href="css/estilo.css">
 #+HTML_HEAD_EXTRA: <link href="favicon.png" rel="icon" type="image/png">
