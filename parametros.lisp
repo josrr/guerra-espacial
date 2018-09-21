@@ -28,7 +28,7 @@
 (defparameter *aceleracion-angular-nave* (/ (* 8.0d0 pi) 51472.0d0))
 (defparameter *aceleracion-nave* 16.0d0)
 (defparameter *paso-nave* 2)
-(defparameter *gravedad* (/ 16.0d0))
+(defparameter *gravedad* (/ 14.0d0))
 
 (declaim (type double-float *radio-colision-1* *radio-colision-2*))
 (defparameter *radio-colision-1* 96d0)

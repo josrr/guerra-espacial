@@ -26,10 +26,19 @@
                (mapcar #'explota-obj (hay-colision-p pane)))))
          (sleep *pausa*))))
 
+(defun salir ()
+  #+sbcl (sb-ext:quit)
+  #+ecl (ext:quit)
+  #+clisp (ext:exit)
+  #+ccl (ccl:quit)
+  #-(or sbcl ecl clisp ccl) (cl-user::quit))
+
 (defun main (&rest arguments)
   (declare (ignore arguments))
   (let ((hilo (bt:make-thread #'inicia :name "guesp")))
-    (bt:join-thread hilo)))
+    (bt:join-thread hilo)
+    (unless (find :swank *features*)
+      (salir))))
 
 
 (defclass espacio-pane (climi::never-repaint-background-mixin basic-gadget)
