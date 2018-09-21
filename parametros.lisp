@@ -26,7 +26,7 @@
 (defparameter *radio-estrella* 5.0d0)
 (defparameter *2pi* (* 2.0d0 pi))
 (defparameter *aceleracion-angular-nave* (/ (* 8.0d0 pi) 51472.0d0))
-(defparameter *aceleracion-nave* 16.0d0)
+(defparameter *aceleracion-nave* 12.0d0)
 (defparameter *paso-nave* 2)
 (defparameter *gravedad* (/ 14.0d0))
 
@@ -39,4 +39,4 @@
 (defparameter *tamaño-torpedos* 512)
 (defparameter *tamaño-nave* 1024)
 (defparameter *numero-de-torpedos* 32)
-(defparameter *combustible* 1536)
+(defparameter *combustible* 1280)
