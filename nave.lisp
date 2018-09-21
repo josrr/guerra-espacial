@@ -216,30 +216,40 @@
     (draw-point* pane x y :ink +blue+ :line-thickness 7)
     (draw-point* pane x y :ink +white+ :line-thickness 4))
   (if (> (getf torpedo :contador) 0)
-      (decf (getf torpedo :contador))
+      (progn
+        (when (and (null (getf torpedo :colisiona))
+                   (= (- *duracion-torpedos* 3) (getf torpedo :contador)))
+          (setf (getf torpedo :colisiona) t))
+        (decf (getf torpedo :contador)))
       (progn
         (setf
          (getf torpedo :contador) *duracion-explosion*
          (getf torpedo :func) #'explosion))))
 
 (defun nuevo-torpedo (nave num)
-  (let ((sen (sin (getf nave :theta)))
-        (cos (cos (getf nave :theta))))
+  (declare (optimize (speed 3))
+           (type fixnum num))
+  (let* ((x (getf nave :x))
+         (y (getf nave :y))
+         (dx (getf nave :dx))
+         (dy (getf nave :dy))
+         (theta (getf nave :theta))
+         (sen (sin theta))
+         (cos (cos theta)))
+    (declare (type double-float sen cos x y theta dx dy))
     (list :tipo :torpedo
           :nombre (alexandria:symbolicate 'torpedo-
                                           (getf nave :nombre)
                                           '- (princ-to-string num))
           :func #'maneja-torpedo
-          :x (+ (getf nave :x) (* -30.0d0 sen))
-          :y (+ (getf nave :y) (* 30.0d0 cos))
-          :dx (+ (getf nave :dx) (* -60.0d0 sen))
-          :dy (+ (getf nave :dy) (* 60.0d0 cos))
-          :mom-angular 0.0d0
+          :x x
+          :y y
+          :dx (+ dx (* -60.0d0 sen))
+          :dy (+ dy (* 60.0d0 cos))
           :sen sen
           :cos cos
-          :theta (getf nave :theta)
-          :vel-angular 0.0d0
-          :colisiona t
+          :theta theta
+          :colisiona nil
           :contador *duracion-torpedos*
           :tamaño *tamaño-torpedos*
           :nave nave)))
