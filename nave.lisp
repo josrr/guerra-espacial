@@ -221,10 +221,8 @@
                    (= (- *duracion-torpedos* 3) (getf torpedo :contador)))
           (setf (getf torpedo :colisiona) t))
         (decf (getf torpedo :contador)))
-      (progn
-        (setf
-         (getf torpedo :contador) *duracion-explosion*
-         (getf torpedo :func) #'explosion))))
+      (setf (getf torpedo :contador) *duracion-explosion*
+            (getf torpedo :func) #'explosion)))
 
 (defun nuevo-torpedo (nave num)
   (declare (optimize (speed 3))
