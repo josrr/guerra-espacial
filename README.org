@@ -1,18 +1,20 @@
-#+TITLE: GUERRA-ESPACIAL
+#+TITLE: GUERRA-ESPACIAL: Spacewar! clone
 #+OPTIONS: toc:nil
 #+HTML_DOCTYPE: html5
 #+HTML_HEAD: <link rel="stylesheet" href="css/estilo.css" />
+#+HTML_HEAD_EXTRA: <link href="favicon.png" rel="icon" type="image/png" />
 #+HTML_LINK_HOME: https://guerra-espacial.rufina.link/
 #+HTML_LINK_UP: https://guerra-espacial.rufina.link/
 This project is intended to be a Spacewar! clone. The only feature that this
 version continues to lack is the hyperspace jump. The starfield uses the same
 data that Peter Samson's Expensive Planetarium.
 
-The starfield data is taken from [[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][this file]].
+GUERRA-ESPACIAL is written in Common Lisp using [[https://common-lisp.net/project/mcclim/][McCLIM]], an implementation of the
+Common Lisp Interface Manager, version II.
 
-You can play an emulated version of Spacewar! and known more facts about this
-game in the series of articles
-[[https://www.masswerk.at/spacewar/inside/][Inside Spacewar!]]
+The starfield data is taken from [[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][this file]]. You can play an emulated version of
+Spacewar! and known more facts about this game in the series of articles [[https://www.masswerk.at/spacewar/inside/][Inside
+Spacewar!]]
 
 * Screenshot
 
