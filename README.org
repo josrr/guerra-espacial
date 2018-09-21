@@ -60,8 +60,7 @@ Is posible to generate an executable file, just load =genexe.lisp=:
  $ sbcl --load genexe.lisp
 #+END_SRC
 
-This must produce the file =./bin/guerra-espacial=.
-
+This must produce the file =./bin/guerra-espacial=. A copy of the executable can be [[https://guerra-espacial.rufina.link/guerra-espacial][downloaded here]].
 
 * Credits
 
