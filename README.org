@@ -49,7 +49,7 @@ $ cd ~/quicklisp/local-projects/guerra-espacial
 $ sbcl --load genexe.lisp
 #+END_SRC
 
-This must produce the file =./bin/guerra-espacil=.
+This must produce the file =./bin/guerra-espacial=.
 
 * Credits
 
