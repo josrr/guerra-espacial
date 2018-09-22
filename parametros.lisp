@@ -1,5 +1,19 @@
 (in-package #:guerra-espacial)
 
+
+(defparameter *teclas* '((:ot2
+                          :izq          (:|a| :|A|)
+                          :der          (:|d| :|D|)
+                          :empuje       (:|s| :|S|)
+                          :fuego        (:|w| :|W|)
+                          :hiperespacio (:|e| :|E|))
+                         (:ot1
+                          :izq          (:|j| :|J|)
+                          :der          (:|l| :|L|)
+                          :empuje       (:|k| :|K|)
+                          :fuego        (:|i| :|I|)
+                          :hiperespacio (:|o| :|O|))))
+
 (declaim (type double-float *ancho-df* *alto-df*))
 (defparameter *ancho* 1024)
 (defparameter *alto* 1024)

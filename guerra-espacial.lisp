@@ -2,7 +2,14 @@
 
 
 (defun inicia ()
-  (let ((frame (make-application-frame 'guerra-espacial)))
+  (let* ((teclas (make-hash-table))
+         (frame (make-application-frame 'guerra-espacial
+                                        :teclas teclas)))
+    (mapcar (lambda (nave)
+              (dolist (op '(:izq :der :empuje :fuego :hiperespacio))
+                (dolist (tecla (getf (cdr nave) op))
+                  (setf (gethash tecla teclas) (list (car nave) op)))))
+            *teclas*)
     (bt:with-lock-held (*bloqueo-guesp*) (setf *guesp* frame))
     (run-frame-top-level frame)
     (bt:with-lock-held (*bloqueo-guesp*) (setf *guesp* nil))
@@ -58,11 +65,11 @@
                           :max-width *ancho*
                           :max-height *alto*))
 
-(define-application-frame
-    guerra-espacial () ()
-    (:panes (espacio-pane (make-pane 'espacio-pane)))
-    (:layouts (:default espacio-pane))
-    (:menu-bar t))
+(define-application-frame guerra-espacial ()
+  ((teclas :initarg :teclas :initform nil))
+  (:panes (espacio-pane (make-pane 'espacio-pane)))
+  (:layouts (:default espacio-pane))
+  (:menu-bar t))
 
 (defmethod run-frame-top-level :before (frame &key &allow-other-keys)
   (bt:make-thread (anima frame) :name "Animación"))
@@ -70,30 +77,22 @@
 
 (defmethod handle-event ((gadget espacio-pane) (evento key-press-event))
   (when *application-frame*
-    (with-slots (escenario) *application-frame*
-      (case (keyboard-event-key-name evento)
-        ((:Q :|q|) (execute-frame-command *application-frame* `(com-salir)))
-        ((:R :|r|) (execute-frame-command *application-frame* `(com-reiniciar)))
-        ((:|a| :|A|) (agrega-control-nave gadget :ot2 :izq))
-        ((:|d| :|D|) (agrega-control-nave gadget :ot2 :der))
-        ((:|s| :|S|) (agrega-control-nave gadget :ot2 :empuje))
-        ((:|w| :|W|) (agrega-control-nave gadget :ot2 :fuego))
-        ((:|j| :|J|) (agrega-control-nave gadget :ot1 :izq))
-        ((:|l| :|L|) (agrega-control-nave gadget :ot1 :der))
-        ((:|k| :|K|) (agrega-control-nave gadget :ot1 :empuje))
-        ((:|i| :|I|) (agrega-control-nave gadget :ot1 :fuego))))))
+    (with-slots (escenario teclas) *application-frame*
+      (let* ((tecla (keyboard-event-key-name evento))
+             (accion (gethash tecla teclas)))
+        (if accion
+            (agrega-control-nave gadget (car accion) (cadr accion))
+            (case tecla
+              ((:|Q| :|q|) (execute-frame-command *application-frame* `(com-salir)))
+              ((:|R| :|r|) (execute-frame-command *application-frame* `(com-reiniciar)))))))))
 
 (defmethod handle-event ((gadget espacio-pane) (evento key-release-event))
   (when *application-frame*
-    (case (keyboard-event-key-name evento)
-      ((:|a| :|A|) (quita-control-nave gadget :ot2 :izq))
-      ((:|d| :|D|) (quita-control-nave gadget :ot2 :der))
-      ((:|s| :|S|) (quita-control-nave gadget :ot2 :empuje))
-      ((:|w| :|W|) (quita-control-nave gadget :ot2 :fuego))
-      ((:|j| :|J|) (quita-control-nave gadget :ot1 :izq))
-      ((:|l| :|L|) (quita-control-nave gadget :ot1 :der))
-      ((:|k| :|K|) (quita-control-nave gadget :ot1 :empuje))
-      ((:|i| :|I|) (quita-control-nave gadget :ot1 :fuego)))))
+    (with-slots (escenario teclas) *application-frame*
+      (let* ((tecla (keyboard-event-key-name evento))
+             (accion (gethash tecla teclas)))
+        (when accion
+          (quita-control-nave gadget (car accion) (cadr accion)))))))
 
 ;;;; Comandos
 (define-guerra-espacial-command (com-salir :name "salir" :menu t)
