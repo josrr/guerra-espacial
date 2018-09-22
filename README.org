@@ -2,7 +2,8 @@
 #+OPTIONS: toc:nil num:nil
 #+UNNUMBERED: t
 #+HTML_DOCTYPE: html5
-#+HTML_HEAD: <link rel="stylesheet" href="css/estilo.css">
+#+HTML_HEAD: <link rel="stylesheet" href="css/spectre.min.css">
+#+HTML_HEAD_EXTRA:  <link rel="stylesheet" href="css/estilo.css">
 #+HTML_HEAD_EXTRA: <link href="favicon.png" rel="icon" type="image/png">
 #+HTML_HEAD_EXTRA: <meta name="Description" content="Spacewar! clone;
 #+HTML_HEAD_EXTRA: written by José M. A. Ronquillo Rivera;
@@ -22,8 +23,8 @@ Spacewar!]]
 
 * Screenshot
 
-#+CAPTION: Screenshot
 #+NAME:   fig:sc01
+#+ATTR_HTML: :class img-responsive centered
 [[./guerra-espacial.gif]]
 
 * How to run the game
