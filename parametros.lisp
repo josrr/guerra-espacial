@@ -54,3 +54,4 @@
 (defparameter *tamaño-nave* 1024)
 (defparameter *numero-de-torpedos* 32)
 (defparameter *combustible* 1280)
+(defparameter *saltos-hiperespacio* 3)

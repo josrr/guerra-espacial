@@ -296,6 +296,7 @@
                     :colisiona t
                     :contador 0
                     :controles nil
+                    :hiperespacio *saltos-hiperespacio*
                     :tamaño *tamaño-nave*
                     :disparando 0
                     :xm (or (getf nave :x) 0.0d0)

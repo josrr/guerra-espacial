@@ -1,5 +1,6 @@
 #+TITLE: GUERRA-ESPACIAL: Spacewar! clone
 #+OPTIONS: toc:nil num:nil
+#+LANGUAGE: es
 #+UNNUMBERED: t
 #+HTML_DOCTYPE: html5
 #+HTML_HEAD: <link rel="stylesheet" href="css/spectre.min.css">
