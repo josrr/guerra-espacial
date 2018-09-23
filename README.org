@@ -19,7 +19,7 @@ GUERRA-ESPACIAL is written in Common Lisp using [[https://common-lisp.net/projec
 Common Lisp Interface Manager, version II.
 
 The starfield data is taken from [[https://www.masswerk.at/spacewar/sources/stars_by_prs_for_sw2b_mar62.txt][this file]]. You can play an emulated version of
-Spacewar! and known more facts about this game in the series of articles [[https://www.masswerk.at/spacewar/inside/][Inside
+Spacewar! and known more facts about this game on the series of articles [[https://www.masswerk.at/spacewar/inside/][Inside
 Spacewar!]]
 
 * Screenshot
