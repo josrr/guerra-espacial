@@ -1,4 +1,4 @@
-#+TITLE: GUERRA-ESPACIAL: Spacewar! clone
+#+TITLE: GUERRA-ESPACIAL: A game inspired by Spacewar!
 #+OPTIONS: toc:nil num:nil
 #+LANGUAGE: es
 #+UNNUMBERED: t
@@ -6,9 +6,8 @@
 #+HTML_HEAD: <link rel="stylesheet" href="css/spectre.min.css">
 #+HTML_HEAD_EXTRA:  <link rel="stylesheet" href="css/estilo.css">
 #+HTML_HEAD_EXTRA: <link href="favicon.png" rel="icon" type="image/png">
-#+HTML_HEAD_EXTRA: <meta name="Description" content="Spacewar! clone;
-#+HTML_HEAD_EXTRA: written by José M. A. Ronquillo Rivera;
-#+HTML_HEAD_EXTRA: using Common Lisp and McCLIM." />
+#+HTML_HEAD_EXTRA: <meta name="Description" content="A game similar to Spacewar!.
+#+HTML_HEAD_EXTRA: Written using Common Lisp and McCLIM  by José M. A. Ronquillo Rivera." />
 #+HTML_LINK_HOME: https://www.guerra-espacial.rufina.link/
 #+HTML_LINK_UP: https://www.guerra-espacial.rufina.link/
 This project is intended to be a Spacewar! clone. The only feature that this
