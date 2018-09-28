@@ -1,6 +1,5 @@
 (in-package #:guerra-espacial)
 
-
 (defparameter *teclas* '((:ot2
                           :izq          (:|a| :|A|)
                           :der          (:|d| :|D|)
@@ -14,11 +13,15 @@
                           :fuego        (:|i| :|I|)
                           :hiperespacio (:|o| :|O|))))
 
-(declaim (type double-float *ancho-df* *alto-df*))
+(declaim (type double-float *ancho-df* *alto-df* *ancho-df/2* *alto-df/2*))
 (defparameter *ancho* 1024)
 (defparameter *alto* 1024)
+(defparameter *ancho/2* 512)
+(defparameter *alto/2* 512)
 (defparameter *ancho-df* (coerce *ancho* 'double-float))
 (defparameter *alto-df* (coerce *alto* 'double-float))
+(defparameter *ancho-df/2* (/ *ancho-df* 2.0d0))
+(defparameter *alto-df/2* (/ *alto-df* 2.0d0))
 
 (declaim (type double-float *max-x* *max-y* *min-x* *min-y*))
 (defparameter *max-x* (/ *ancho* 2.0d0))
@@ -30,7 +33,6 @@
 (defparameter *guesp* nil)
 (defparameter *pausa* (/ 40.0d0))
 (defparameter *ruta-del-sistema* (asdf:component-pathname (asdf:find-system 'guerra-espacial)))
-(defparameter *bloqueo-guesp* (bt:make-lock "Bloqueo para el frame"))
 (defparameter *desp-x* (/ (* *pausa* 8192) (* 24 60 60)))
 (defparameter *ancho-mapa-estelar* 8192)
 (defparameter *max-x-mapa-estelar* (1- *ancho-mapa-estelar*))
@@ -48,10 +50,19 @@
 (defparameter *radio-colision-1* 96d0)
 (defparameter *radio-colision-2* 48d0)
 
+(declaim (type double-float *torpedo-vel-inicial* *torpedo-space-warpage*))
 (defparameter *duracion-explosion* 16)
 (defparameter *duracion-torpedos* 120)
 (defparameter *tamaño-torpedos* 512)
 (defparameter *tamaño-nave* 1024)
 (defparameter *numero-de-torpedos* 32)
+(defparameter *torpedo-vel-inicial* 16.0d0)
+(defparameter *torpedo-space-warpage* 512.0d0)
 (defparameter *combustible* 1280)
-(defparameter *saltos-hiperespacio* 3)
+(defparameter *hiperespacio-num-saltos* 8)
+(defparameter *hiperespacio-tiempo-enfriamiento* 32)
+(defparameter *hiperespacio-tiempo* 64)
+
+;; Munching squares
+(declaim (type double-float *ms-cuantos*))
+(defparameter *ms-num-cuadros* 64.0d0)

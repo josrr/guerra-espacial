@@ -58,15 +58,13 @@
     (let ((x (+ 512.0d0 x))
           (y (- 512.0d0 y)))
       (loop for m fixnum from (floor (the fixnum (getf obj :tamaño)) 8) downto 1
-         for factor double-float = (random (if (> m 96) 256.0d0 64.0d0))  do
-           (draw-point* pane
-                        (+ x (* factor (- (random 1.0d0) 0.5d0)))
-                        (+ y (* factor (- (random 1.0d0) 0.5d0)))
-                        :ink (if (zerop (random 2))
-                                 +light-steel-blue+ +royalblue+
-                                        ;+pink+ +deep-pink+
-                                 )
-                        :line-thickness 4))))
+            for factor double-float = (random (if (> m 96) 256.0d0 64.0d0))  do
+              (draw-point* pane
+                           (+ x (* factor (- (random 1.0d0) 0.5d0)))
+                           (+ y (* factor (- (random 1.0d0) 0.5d0)))
+                           :ink (if (zerop (random 2))
+                                    +light-steel-blue+ +royalblue+)
+                           :line-thickness 4))))
   (when (zerop (decf (the fixnum (getf obj :contador))))
     (setf (getf obj :func) nil
           (espacio-objs pane) (remove obj (espacio-objs pane)))))
@@ -143,6 +141,15 @@
         (actualiza-posicion-obj nave)))
     (values empuje izq der)))
 
+(defun dibuja-minskytron (pane num-puntos nave-x nave-y x y d w)
+  (loop
+     with desp-x = (+ nave-x *ancho/2*) and desp-y = (- *alto/2* nave-y)
+     with i = x and j = y
+     repeat num-puntos do
+       (draw-point* pane (+ desp-x i) (- desp-y j) :ink +cyan+ :line-thickness 4)
+       (setf j (- j (floor i d))
+             i (+ i (floor j w)))))
+
 (defun dibuja-gases-nave (pane x y sen cos color-1 color-2 &optional (max-largo 16))
   (declare (optimize (speed 3) (safety 0))
            (type double-float x y sen cos)
@@ -181,36 +188,40 @@
     (declare (type double-float xo yo x y ssn scn ssm scm ssc csn ssd csm abs-paso angulo)
              (type fixnum paso))
     (loop with guardada = nil
-       for valor in (getf nave :desc) do
-         (with-drawing-options (pane :ink +yellow+ :line-thickness 1 :line-cap-shape :round)
-           (draw-point* pane (the fixnum (round x)) (the fixnum (round y)))
-           (case valor
-             ((0 1) (incf x ssn) (incf y scn) nil)
-             (2     (incf x scm) (decf y ssm) nil)
-             (3     (incf x ssc) (incf y csm) nil)
-             (4     (decf x scm) (incf y ssm) nil)
-             (5     (incf x csn) (incf y ssd) nil)
-             (6 (if guardada
-                    (setf x (car guardada)
-                          y (cdr guardada)
-                          guardada nil)
-                    (setf guardada (cons x y))))
-             (7 (when (zerop ciclo)
-                  (dibuja-nave pane nave empuje izq der (- paso) 1))
-                ;;(when (eq (getf nave :nombre) :ot2) (log:info x y))
-                (setf (getf nave :xm) (/ (+ (- x 512d0) xo) 2)
-                      (getf nave :ym) (/ (+ (- 512d0 y) yo) 2))
-                (return t)))))
+          for valor in (getf nave :desc) do
+            (with-drawing-options (pane :ink +yellow+ :line-thickness 1 :line-cap-shape :round)
+              (draw-point* pane (the fixnum (round x)) (the fixnum (round y)))
+              (case valor
+                ((0 1) (incf x ssn) (incf y scn) nil)
+                (2     (incf x scm) (decf y ssm) nil)
+                (3     (incf x ssc) (incf y csm) nil)
+                (4     (decf x scm) (incf y ssm) nil)
+                (5     (incf x csn) (incf y ssd) nil)
+                (6 (if guardada
+                       (setf x (car guardada)
+                             y (cdr guardada)
+                             guardada nil)
+                       (setf guardada (cons x y))))
+                (7 (when (zerop ciclo)
+                     (dibuja-nave pane nave empuje izq der (- paso) 1))
+                 (setf (getf nave :xm) (/ (+ (- x 512d0) xo) 2)
+                       (getf nave :ym) (/ (+ (- 512d0 y) yo) 2))
+                 (return t)))))
     (when empuje (dibuja-gases-nave pane x y sen cos +darkorange+ +white+))
     (when der    (dibuja-gases-nave pane (+ x (* 11d0 cos)) (+ y (* -11d0 sen)) cos (- sen) +snow3+ +white+ 6))
     (when izq    (dibuja-gases-nave pane (+ x (* -11d0 cos)) (+ y (* 11d0 sen)) (- cos) sen +snow3+ +white+ 6))))
 
 (defun maneja-torpedo (pane torpedo)
   (multiple-value-bind (bx by) (gravedad torpedo)
-    (when bx
-      (incf (getf torpedo :dy) by)
-      (incf (getf torpedo :dx) bx)
-      (actualiza-posicion-obj torpedo)))
+    (when bx (incf (getf torpedo :dy) by)
+          (incf (getf torpedo :dx) bx)
+          (let ((warpage (* 512.0d0 *torpedo-space-warpage*)))
+            (declare (type double-float warpage))
+            (incf (getf torpedo :dy) (/ (getf torpedo :x) warpage))
+            (incf (getf torpedo :y) (/ (getf torpedo :dy) 8.0d0))
+            (incf (getf torpedo :dx) (/ (getf torpedo :y) warpage))
+            (incf (getf torpedo :x) (/ (getf torpedo :dx) 8.0d0)))
+          (toroidalizar torpedo)))
   (let ((x (+ 512.0d0 (getf torpedo :x)))
         (y (- 512.0d0 (getf torpedo :y))))
     (draw-point* pane x y :ink +blue+ :line-thickness 7)
@@ -218,7 +229,7 @@
   (if (> (getf torpedo :contador) 0)
       (progn
         (when (and (null (getf torpedo :colisiona))
-                   (= (- *duracion-torpedos* 3) (getf torpedo :contador)))
+                   (= (- *duracion-torpedos* 12) (getf torpedo :contador)))
           (setf (getf torpedo :colisiona) t))
         (decf (getf torpedo :contador)))
       (setf (getf torpedo :contador) *duracion-explosion*
@@ -231,26 +242,46 @@
          (y (getf nave :y))
          (dx (getf nave :dx))
          (dy (getf nave :dy))
-         (theta (getf nave :theta))
-         (sen (sin theta))
-         (cos (cos theta)))
-    (declare (type double-float sen cos x y theta dx dy))
+         (sen (getf nave :sen))
+         (cos (getf nave :cos)))
+    (declare (type double-float sen cos x y dx dy))
     (list :tipo :torpedo
           :nombre (alexandria:symbolicate 'torpedo-
                                           (getf nave :nombre)
                                           '- (princ-to-string num))
           :func #'maneja-torpedo
-          :x (- x sen)
-          :y (+ y cos)
-          :dx (+ dx (* -60.0d0 sen))
-          :dy (+ dy (* 60.0d0 cos))
+          :x (- x (* 8.0d0 sen))
+          :y (+ y (* 8.0d0 cos))
+          :dx (- dx (* *torpedo-vel-inicial* sen))
+          :dy (+ dy (* *torpedo-vel-inicial* cos))
           :sen sen
           :cos cos
-          :theta theta
           :colisiona nil
           :contador *duracion-torpedos*
           :tamaño *tamaño-torpedos*
           :nave nave)))
+
+(defun hiperespacio (nave)
+  (let* ((contador (getf nave :contador)))
+    (lambda (pane nave)
+      (cond
+        ((> (getf nave :contador) 0)
+         (let ((c (- contador (getf nave :contador))))
+           (decf (getf nave :contador))
+           (dibuja-minskytron pane c (getf nave :x) (getf nave :y) -12 12  -67 -1)
+           (dibuja-minskytron pane c (getf nave :x) (getf nave :y) 12 12 1 (+ (floor c 4) 67))))
+        (t
+         (setf (getf nave :x) (- (random *ancho-df*) *ancho-df/2*)
+               (getf nave :y) (- (random *ancho-df*) *alto-df/2*)
+               (getf nave :colisiona) t
+               (getf nave :func) #'maneja-nave))))))
+
+(defun salta-al-hiperespacio (pane nave)
+  (declare (ignore pane))
+  (decf (getf nave :hiperespacio))
+  (setf (getf nave :contador) 40
+        (getf nave :colisiona) nil
+        (getf nave :func) (hiperespacio nave)))
 
 (defun dispara-torpedo (pane nave)
   (when (> (getf nave :torpedos) 0)
@@ -258,7 +289,6 @@
           (espacio-objs pane))
     (decf (getf nave :torpedos))))
 
-;;(setf (getf nave :controles) (remove :fuego (getf nave :controles) :count 1))
 (defun maneja-nave (pane nave)
   (setf (getf nave :sen) (sin (getf nave :theta))
         (getf nave :cos) (cos (getf nave :theta)))
@@ -268,13 +298,17 @@
                  izq der)
     (when (and empuje (> (getf nave :combustible) 0))
       (decf (getf nave :combustible))))
-  (if (and (member :fuego (getf nave :controles))
-           (zerop (getf nave :disparando)))
-      (progn
-        (setf (getf nave :disparando) 5)
-        (dispara-torpedo pane nave))
-      (when (> (getf nave :disparando) 0)
-        (decf (getf nave :disparando)))))
+
+  (when (member :fuego (getf nave :controles))
+    (if (zerop (getf nave :disparando))
+        (progn
+          (setf (getf nave :disparando) 32)
+          (dispara-torpedo pane nave))))
+  (when (> (getf nave :disparando) 0)
+    (decf (getf nave :disparando)))
+  (when (and (member :hiperespacio (getf nave :controles))
+             (> (getf nave :hiperespacio) 0))
+    (salta-al-hiperespacio pane nave)))
 
 (defun carga-naves (lista)
   (mapcar (lambda (datos)
@@ -296,14 +330,15 @@
                     :colisiona t
                     :contador 0
                     :controles nil
-                    :hiperespacio *saltos-hiperespacio*
+                    :hiperespacio *hiperespacio-num-saltos*
                     :tamaño *tamaño-nave*
                     :disparando 0
                     :xm (or (getf nave :x) 0.0d0)
                     :ym (or (getf nave :y) 0.0d0)
-                    :desc (loop for palabra in (getf nave :forma) append
-                               (loop for v across (format nil "~o" palabra) collect
-                                    (- (char-code v) (char-code #\0)))))))
+                    :desc (loop for palabra in (getf nave :forma)
+                                append
+                                (loop for v across (format nil "~o" palabra)
+                                      collect (- (char-code v) (char-code #\0)))))))
           lista))
 
 (defun dame-nave (pane nombre)
@@ -312,9 +347,11 @@
 
 (defun agrega-control-nave (gadget nombre-nave control)
   (let ((nave (dame-nave gadget nombre-nave)))
-    (push control (getf nave :controles))))
+    (bt:with-lock-held ((guesp-bloqueo *guesp*))
+      (push control (getf nave :controles)))))
 
 (defun quita-control-nave (gadget nombre-nave control)
   (let ((nave (dame-nave gadget nombre-nave)))
-    (setf (getf nave :controles)
-          (remove control (getf nave :controles)))))
+    (bt:with-lock-held ((guesp-bloqueo *application-frame*))
+      (setf (getf nave :controles)
+            (remove control (getf nave :controles))))))
