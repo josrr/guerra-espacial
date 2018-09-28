@@ -187,7 +187,7 @@
     (bt:with-lock-held ((guesp-bloqueo *application-frame*))
       (setf (espacio-animacion-func espacio) #'minskytron
             (espacio-num-cuadro espacio) 1
-            (espacio-datos espacio) (list))
+            (espacio-datos espacio) nil)
       (draw-rectangle* (espacio-pixmap espacio) 0 0
                        (bounding-rectangle-width (sheet-region espacio))
                        (bounding-rectangle-height (sheet-region espacio))
@@ -205,7 +205,12 @@
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
     (bt:with-lock-held ((guesp-bloqueo *application-frame*))
       (setf (espacio-objs espacio) (carga-naves *naves*)
-            (espacio-num-cuadro espacio) 1))))
+            (espacio-num-cuadro espacio) 1
+            (espacio-datos espacio) nil)
+      (draw-rectangle* (espacio-pixmap espacio) 0 0
+                       (bounding-rectangle-width (sheet-region espacio))
+                       (bounding-rectangle-height (sheet-region espacio))
+                       :ink +black+))))
 
 (define-guerra-espacial-command (com-salir :name "Salir" :menu t)
     ()
