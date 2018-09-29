@@ -13,20 +13,20 @@
   (declare (optimize (speed 3) (safety 0)))
   (draw-rectangle* pane 0 0 *ancho* *alto* :filled t :ink +black+)
   (loop with cuantos double-float = *ms-num-cuadros*
-     with cuantos-1 fixnum = (round (1- cuantos))
-     with total double-float = (* cuantos cuantos)
-     with num-cuadro fixnum = (espacio-num-cuadro pane)
-     with ancho double-float = (min (/ *ancho-df* cuantos) (/ *alto-df* cuantos))
-     with ancho/2 double-float = (/ ancho 2.0d0)
-     with cuantos-si double-float = 0.0d0
-     for x from 0 to cuantos-1 and xa double-float from ancho/2 by ancho do
-       (loop for y from 0 to cuantos-1 and ya double-float from ancho/2 by ancho
-          if (< (logxor x y) num-cuadro) do
-            (draw-point* pane xa ya :ink +cyan+ :line-thickness ancho)
-            (incf cuantos-si))
-     finally (if (= cuantos-si total)
-                 (setf (espacio-num-cuadro pane) 0)
-                 (incf (espacio-num-cuadro pane)))))
+        with cuantos-1 fixnum = (round (1- cuantos))
+        with total double-float = (* cuantos cuantos)
+        with num-cuadro fixnum = (espacio-num-cuadro pane)
+        with ancho double-float = (min (/ *ancho-df* cuantos) (/ *alto-df* cuantos))
+        with ancho/2 double-float = (/ ancho 2.0d0)
+        with cuantos-si double-float = 0.0d0
+        for x from 0 to cuantos-1 and xa double-float from ancho/2 by ancho do
+          (loop for y from 0 to cuantos-1 and ya double-float from ancho/2 by ancho
+                if (< (logxor x y) num-cuadro) do
+                  (draw-point* pane xa ya :ink +cyan+ :line-thickness ancho)
+                  (incf cuantos-si))
+        finally (if (= cuantos-si total)
+                    (setf (espacio-num-cuadro pane) 0)
+                    (incf (the fixnum (espacio-num-cuadro pane))))))
 
 (defun minskytron (pane)
   (let* ((datos (espacio-datos pane))
@@ -162,7 +162,7 @@
             (agrega-control-nave gadget (car accion) (cadr accion))
             (case tecla
               ((:|Q| :|q|) (execute-frame-command *application-frame* `(com-salir)))
-              ((:|R| :|r|) (execute-frame-command *application-frame* `(com-reiniciar)))))))))
+              ((:|N| :|n|) (execute-frame-command *application-frame* `(com-reiniciar)))))))))
 
 (defmethod handle-event ((gadget espacio-pane) (evento key-release-event))
   (when *application-frame*

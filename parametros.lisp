@@ -50,7 +50,7 @@
 (defparameter *radio-colision-1* 96d0)
 (defparameter *radio-colision-2* 48d0)
 
-(declaim (type double-float *torpedo-vel-inicial* *torpedo-space-warpage*))
+(declaim (type double-float *torpedo-vel-inicial* *torpedo-space-warpage* *hiperespacio-probabilidad-explosion*))
 (defparameter *duracion-explosion* 16)
 (defparameter *duracion-torpedos* 120)
 (defparameter *tamaño-torpedos* 512)
@@ -60,8 +60,11 @@
 (defparameter *torpedo-space-warpage* 512.0d0)
 (defparameter *combustible* 1280)
 (defparameter *hiperespacio-num-saltos* 8)
-(defparameter *hiperespacio-tiempo-enfriamiento* 32)
-(defparameter *hiperespacio-tiempo* 64)
+(defparameter *hiperespacio-tiempo-1* 48)
+(defparameter *hiperespacio-tiempo-2* 32)
+(defparameter *hiperespacio-tiempo-enfriamiento* 128)
+(defparameter *hiperespacio-probabilidad-explosion* (/ 2.0d0 *hiperespacio-num-saltos*))
+
 
 ;; Munching squares
 (declaim (type double-float *ms-cuantos*))

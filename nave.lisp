@@ -55,8 +55,8 @@
   (declare (optimize (speed 3) (safety 0)))
   (multiple-value-bind (x y) (actualiza-posicion-obj obj)
     (declare (type double-float x y))
-    (let ((x (+ 512.0d0 x))
-          (y (- 512.0d0 y)))
+    (let ((x (+ *ancho-df/2* x))
+          (y (- *alto-df/2* y)))
       (loop for m fixnum from (floor (the fixnum (getf obj :tamaño)) 8) downto 1
             for factor double-float = (random (if (> m 96) 256.0d0 64.0d0))  do
               (draw-point* pane
@@ -143,12 +143,12 @@
 
 (defun dibuja-minskytron (pane num-puntos nave-x nave-y x y d w)
   (loop
-     with desp-x = (+ nave-x *ancho/2*) and desp-y = (- *alto/2* nave-y)
-     with i = x and j = y
-     repeat num-puntos do
-       (draw-point* pane (+ desp-x i) (- desp-y j) :ink +cyan+ :line-thickness 4)
-       (setf j (- j (floor i d))
-             i (+ i (floor j w)))))
+    with desp-x = (+ nave-x *ancho-df/2*) and desp-y = (- *alto-df/2* nave-y)
+    with i = x and j = y
+    repeat num-puntos do
+      (draw-point* pane (+ desp-x i) (- desp-y j) :ink +skyblue+ :line-thickness 4)
+      (setf j (- j (floor i d))
+            i (+ i (floor j w)))))
 
 (defun dibuja-gases-nave (pane x y sen cos color-1 color-2 &optional (max-largo 16))
   (declare (optimize (speed 3) (safety 0))
@@ -160,20 +160,19 @@
     (declare (type double-float sen cos)
              (type fixnum largo))
     (loop repeat largo
-       for x double-float from x by sen
-       for y double-float from y by cos
-       for dx double-float = (- 1.0d0 (random 2.0d0)) do
-         (draw-point* pane (+ dx x) y :ink color-1  :line-thickness 3)
-         (draw-point* pane (- x dx) y :ink color-2 :line-thickness 1))))
+          for x double-float from x by sen
+          for y double-float from y by cos
+          for dx double-float = (- 1.0d0 (random 2.0d0)) do
+            (draw-point* pane (+ dx x) y :ink color-1  :line-thickness 3)
+            (draw-point* pane (- x dx) y :ink color-2 :line-thickness 1))))
 
 (defun dibuja-nave (pane nave &optional empuje izq der (paso *paso-nave*) (ciclo 0))
   (declare (optimize (speed 3) (safety 0))
            (type fixnum ciclo))
-  (let* ((angulo (getf nave :theta))
-         (xo (getf nave :x))
+  (let* ((xo (getf nave :x))
          (yo (getf nave :y))
-         (x (+ 512.0d0 xo))
-         (y (- 512.0d0 yo))
+         (x (+ *ancho-df/2* xo))
+         (y (- *alto-df/2* yo))
          (abs-paso (coerce (abs paso) 'double-float))
          (sen (getf nave :sen))
          (cos (getf nave :cos))
@@ -185,7 +184,7 @@
          (csn (- ssn scm))
          (ssd (+ scn ssm))
          (csm (- scn ssm)))
-    (declare (type double-float xo yo x y ssn scn ssm scm ssc csn ssd csm abs-paso angulo)
+    (declare (type double-float xo yo x y ssn scn ssm scm ssc csn ssd csm abs-paso)
              (type fixnum paso))
     (loop with guardada = nil
           for valor in (getf nave :desc) do
@@ -204,8 +203,8 @@
                        (setf guardada (cons x y))))
                 (7 (when (zerop ciclo)
                      (dibuja-nave pane nave empuje izq der (- paso) 1))
-                 (setf (getf nave :xm) (/ (+ (- x 512d0) xo) 2)
-                       (getf nave :ym) (/ (+ (- 512d0 y) yo) 2))
+                 (setf (getf nave :xm) (/ (+ (- x *ancho-df/2*) xo) 2)
+                       (getf nave :ym) (/ (+ (- *alto-df/2* y) yo) 2))
                  (return t)))))
     (when empuje (dibuja-gases-nave pane x y sen cos +darkorange+ +white+))
     (when der    (dibuja-gases-nave pane (+ x (* 11d0 cos)) (+ y (* -11d0 sen)) cos (- sen) +snow3+ +white+ 6))
@@ -222,8 +221,8 @@
             (incf (getf torpedo :dx) (/ (getf torpedo :y) warpage))
             (incf (getf torpedo :x) (/ (getf torpedo :dx) 8.0d0)))
           (toroidalizar torpedo)))
-  (let ((x (+ 512.0d0 (getf torpedo :x)))
-        (y (- 512.0d0 (getf torpedo :y))))
+  (let ((x (+ *ancho-df/2* (getf torpedo :x)))
+        (y (- *alto-df/2* (getf torpedo :y))))
     (draw-point* pane x y :ink +blue+ :line-thickness 7)
     (draw-point* pane x y :ink +white+ :line-thickness 4))
   (if (> (getf torpedo :contador) 0)
@@ -261,25 +260,44 @@
           :tamaño *tamaño-torpedos*
           :nave nave)))
 
+(defun sal-del-hiperespacio (pane nave)
+  (if (zerop (getf nave :contador))
+      (if (= (getf nave :hiperespacio) (random *hiperespacio-num-saltos*))
+          (explota-obj nave)
+          (setf (getf nave :hiperespacio-tiempo-enfriamiento) *hiperespacio-tiempo-enfriamiento*
+                (getf nave :colisiona) t
+                (getf nave :func) #'maneja-nave))
+      (progn
+        (draw-circle* pane
+                      (+ *ancho-df/2* (getf nave :x)) (- *alto-df/2* (getf nave :y))
+                      (/ *hiperespacio-tiempo-1* (getf nave :contador))
+                      :filled nil
+                      :ink +skyblue+
+                      :line-thickness 2)
+        (decf (getf nave :contador)))))
+
 (defun hiperespacio (nave)
   (let* ((contador (getf nave :contador)))
     (lambda (pane nave)
-      (cond
-        ((> (getf nave :contador) 0)
-         (let ((c (- contador (getf nave :contador))))
-           (decf (getf nave :contador))
-           (dibuja-minskytron pane c (getf nave :x) (getf nave :y) -12 12  -67 -1)
-           (dibuja-minskytron pane c (getf nave :x) (getf nave :y) 12 12 1 (+ (floor c 4) 67))))
-        (t
-         (setf (getf nave :x) (- (random *ancho-df*) *ancho-df/2*)
-               (getf nave :y) (- (random *ancho-df*) *alto-df/2*)
-               (getf nave :colisiona) t
-               (getf nave :func) #'maneja-nave))))))
+      (if (> (getf nave :contador) 0)
+          (let ((c (- contador (getf nave :contador))))
+            (decf (getf nave :contador))
+            (dibuja-minskytron pane c (getf nave :x) (getf nave :y) -12 12  -67 -1)
+            (dibuja-minskytron pane c (getf nave :x) (getf nave :y) 12 12 1 (+ (floor c 4) 67)))
+          (setf (getf nave :x) (- (random *ancho-df*) *ancho-df/2*)
+                (getf nave :y) (- (random *ancho-df*) *alto-df/2*)
+                (getf nave :xm) (getf nave :x)
+                (getf nave :ym) (getf nave :y)
+                (getf nave :theta) (random *2pi*)
+                (getf nave :sen) (sin (getf nave :theta))
+                (getf nave :cos) (cos (getf nave :theta))
+                (getf nave :contador) *hiperespacio-tiempo-2*
+                (getf nave :func) #'sal-del-hiperespacio)))))
 
 (defun salta-al-hiperespacio (pane nave)
   (declare (ignore pane))
   (decf (getf nave :hiperespacio))
-  (setf (getf nave :contador) 40
+  (setf (getf nave :contador) *hiperespacio-tiempo-1*
         (getf nave :colisiona) nil
         (getf nave :func) (hiperespacio nave)))
 
@@ -307,8 +325,11 @@
   (when (> (getf nave :disparando) 0)
     (decf (getf nave :disparando)))
   (when (and (member :hiperespacio (getf nave :controles))
-             (> (getf nave :hiperespacio) 0))
-    (salta-al-hiperespacio pane nave)))
+             (> (getf nave :hiperespacio) 0)
+             (zerop (getf nave :hiperespacio-tiempo-enfriamiento)))
+    (salta-al-hiperespacio pane nave))
+  (when (> (getf nave :hiperespacio-tiempo-enfriamiento) 0)
+    (decf (getf nave :hiperespacio-tiempo-enfriamiento))))
 
 (defun carga-naves (lista)
   (mapcar (lambda (datos)
@@ -331,6 +352,7 @@
                     :contador 0
                     :controles nil
                     :hiperespacio *hiperespacio-num-saltos*
+                    :hiperespacio-tiempo-enfriamiento 0
                     :tamaño *tamaño-nave*
                     :disparando 0
                     :xm (or (getf nave :x) 0.0d0)
