@@ -270,7 +270,7 @@
       (progn
         (draw-circle* pane
                       (+ *ancho-df/2* (getf nave :x)) (- *alto-df/2* (getf nave :y))
-                      (/ *hiperespacio-tiempo-1* (getf nave :contador))
+                      (/ *hiperespacio-tiempo-2* (getf nave :contador))
                       :filled nil
                       :ink +skyblue+
                       :line-thickness 2)
