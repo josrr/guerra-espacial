@@ -1,77 +1,20 @@
 (in-package #:guerra-espacial)
 
-
-(defun spacewar! (pane)
-  (dibuja-estrellas pane)
-  (dibuja-estrella pane (/ *ancho* 2) (/ *alto* 2))
-  (loop for obj in (espacio-objs pane)
-        if (not (null (getf obj :func))) do
-          (funcall (getf obj :func) pane obj))
-  (mapcar #'explota-obj (hay-colision-p pane)))
-
-(defun munching-squares (pane)
-  (declare (optimize (speed 3) (safety 0)))
-  (draw-rectangle* pane 0 0 *ancho* *alto* :filled t :ink +black+)
-  (loop with cuantos double-float = *ms-num-cuadros*
-        with cuantos-1 fixnum = (round (1- cuantos))
-        with total double-float = (* cuantos cuantos)
-        with num-cuadro fixnum = (espacio-num-cuadro pane)
-        with ancho double-float = (min (/ *ancho-df* cuantos) (/ *alto-df* cuantos))
-        with ancho/2 double-float = (/ ancho 2.0d0)
-        with cuantos-si double-float = 0.0d0
-        for x from 0 to cuantos-1 and xa double-float from ancho/2 by ancho do
-          (loop for y from 0 to cuantos-1 and ya double-float from ancho/2 by ancho
-                if (< (logxor x y) num-cuadro) do
-                  (draw-point* pane xa ya :ink +cyan+ :line-thickness ancho)
-                  (incf cuantos-si))
-        finally (if (= cuantos-si total)
-                    (setf (espacio-num-cuadro pane) 0)
-                    (incf (the fixnum (espacio-num-cuadro pane))))))
-
-(defun minskytron (pane)
-  (let* ((datos (espacio-datos pane))
-         (x (if datos (car datos) -19/24))
-         (y (if datos (cadr datos) -1015/121))
-         (δ 7381/5040)
-         (ω 5040/7381)
-         (ancho (bounding-rectangle-width (sheet-region pane)))
-         (alto (bounding-rectangle-height (sheet-region pane))))
-    (let ((pixmap (espacio-pixmap pane)))
-      (when pixmap
-        (loop for i from 0 below 1000
-           for px = (+ 512 x) and py = (- 512 y)
-           for color = (/ (log (incf (espacio-num-cuadro pane))) 255 10)
-           if (and (>= px 0) (< px ancho) (>= py 0) (< py alto)) do
-             (draw-point* pixmap px py
-                          :ink (clim:make-rgb-color (random 1.0) 0.75
-                                                    (if (> color 1) 1 color))
-                          :line-thickness 1)
-           end do
-             (setf y (- y (floor x δ))
-                   x (+ x (floor y ω))))
-        (if (null (espacio-datos pane))
-            (setf (espacio-datos pane) (list x y))
-            (setf (car (espacio-datos pane)) x
-                  (cadr (espacio-datos pane)) y))
-        (copy-from-pixmap pixmap 0 0
-                          (bounding-rectangle-width (sheet-region pane))
-                          (bounding-rectangle-height (sheet-region pane))
-                          pane 0 0)))))
-
 (defun anima (frame)
   (lambda ()
     (loop with pane = (find-pane-named frame 'espacio-pane)
-       while (bt:with-lock-held ((guesp-bloqueo frame)) *guesp*)
-       do
-         (bt:with-lock-held ((guesp-bloqueo frame))
-           (when *guesp*
-             (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
-               (climi::with-double-buffering ((pane x0 y0 x1 y1) (wtf-wtf-wtf))
-                 (declare (ignore wtf-wtf-wtf))
-                 (when (espacio-animacion-func pane)
-                   (funcall (espacio-animacion-func pane) pane))))))
-         (bt:thread-yield)
-         (sleep *pausa*))))
+          while (bt:with-lock-held ((guesp-bloqueo frame)) *guesp*)
+            initially (presentacion pane)
+          do
+             (bt:with-lock-held ((guesp-bloqueo frame))
+               (when *guesp*
+                 (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
+                   (climi::with-double-buffering ((pane x0 y0 x1 y1) (wtf-wtf-wtf))
+                     (declare (ignore wtf-wtf-wtf))
+                     (when (espacio-animacion-func pane)
+                       (funcall (espacio-animacion-func pane) pane))))))
+             (bt:thread-yield)
+             (sleep *pausa*))))
 
 
 (defun inicia ()
@@ -116,9 +59,10 @@
    (pixmap :initform nil :accessor espacio-pixmap)
    (estrellas :initform *estrellas* :reader espacio-estrellas)
    (objetos :initform (carga-naves *naves*) :accessor espacio-objs)
-   (num-cuadro :initform 0 :accessor espacio-num-cuadro)
+   (num-cuadro :initform 1 :accessor espacio-num-cuadro)
    (animacion-func :initarg :animacion-func :initform nil :accessor espacio-animacion-func)
-   (datos :initform (list) :accessor espacio-datos)))
+   (datos :initform (list) :accessor espacio-datos)
+   (jugando :initform nil :accessor espacio-jugando)))
 
 (defmethod initialize-instance :after ((pane espacio-pane) &key contents)
   (declare (ignore contents))
@@ -162,7 +106,9 @@
             (agrega-control-nave gadget (car accion) (cadr accion))
             (case tecla
               ((:|Q| :|q|) (execute-frame-command *application-frame* `(com-salir)))
-              ((:|N| :|n|) (execute-frame-command *application-frame* `(com-reiniciar)))))))))
+              ((:|N| :|n|) (execute-frame-command *application-frame* `(com-reiniciar)))
+              (t (unless (espacio-jugando gadget)
+                   (execute-frame-command *application-frame* `(com-guerra-espacial))))))))))
 
 (defmethod handle-event ((gadget espacio-pane) (evento key-release-event))
   (when *application-frame*
@@ -185,7 +131,8 @@
     ()
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
     (bt:with-lock-held ((guesp-bloqueo *application-frame*))
-      (setf (espacio-animacion-func espacio) #'minskytron
+      (setf (espacio-jugando espacio) t
+            (espacio-animacion-func espacio) #'minskytron
             (espacio-num-cuadro espacio) 1
             (espacio-datos espacio) nil)
       (draw-rectangle* (espacio-pixmap espacio) 0 0

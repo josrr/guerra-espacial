@@ -26,11 +26,13 @@
   :build-operation "deploy-op"
   :build-pathname #P"guerra-espacial"
   :entry-point "guerra-espacial:guerra-espacial-entry-point"
-  :depends-on (#:bordeaux-threads #:mcclim #:mcclim-raster-image)
+  :depends-on (#:bordeaux-threads #:mcclim)
   :components ((:file "paquetes")
                (:file "parametros")
                (:file "nave")
                (:file "estrella")
                (:file "datos-naves")
                (:file "datos-estrellas")
+               (:file "animaciones")
+               (:file "presentacion")
                (:file "guerra-espacial")))
