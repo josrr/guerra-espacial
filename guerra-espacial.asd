@@ -22,7 +22,7 @@
   :author "José Miguel Ronquillo Rivera <jose@rufina.link>"
   :serial t
   :license  "GPL Ver. 3"
-  :version "0.0.1"
+  :version "0.0.2"
   :build-operation "deploy-op"
   :build-pathname #P"guerra-espacial"
   :entry-point "guerra-espacial:guerra-espacial-entry-point"
