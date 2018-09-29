@@ -184,7 +184,7 @@
          (csn (- ssn scm))
          (ssd (+ scn ssm))
          (csm (- scn ssm)))
-    (declare (type double-float xo yo x y ssn scn ssm scm ssc csn ssd csm abs-paso)
+    (declare (type double-float xo yo x y ssn scn ssm scm ssc csn ssd csm abs-paso sen cos)
              (type fixnum paso))
     (loop with guardada = nil
           for valor in (getf nave :desc) do
