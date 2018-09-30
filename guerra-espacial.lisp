@@ -3,11 +3,10 @@
 (defun anima (frame)
   (lambda ()
     (loop with pane = (find-pane-named frame 'espacio-pane)
-          while (bt:with-lock-held ((guesp-bloqueo frame)) *guesp*)
+          while (bt:with-lock-held ((guesp-bloqueo frame)) (null (espacio-terminar pane)))
             initially (presentacion pane)
-          do
-             (bt:with-lock-held ((guesp-bloqueo frame))
-               (when *guesp*
+          do (bt:with-lock-held ((guesp-bloqueo frame))
+               (unless (espacio-terminar pane)
                  (with-bounding-rectangle* (x0 y0 x1 y1) (sheet-region pane)
                    (climi::with-double-buffering ((pane x0 y0 x1 y1) (wtf-wtf-wtf))
                      (declare (ignore wtf-wtf-wtf))
@@ -26,9 +25,7 @@
                 (dolist (tecla (getf (cdr nave) op))
                   (setf (gethash tecla teclas) (list (car nave) op)))))
             *teclas*)
-    (bt:with-lock-held ((guesp-bloqueo frame)) (setf *guesp* frame))
     (run-frame-top-level frame)
-    (bt:with-lock-held ((guesp-bloqueo frame)) (setf *guesp* nil))
     (when (espacio-pixmap (find-pane-named frame 'espacio-pane))
       (clim:deallocate-pixmap (espacio-pixmap (find-pane-named frame 'espacio-pane))))
     (let ((hilo (guesp-hilo-animacion frame)))
@@ -62,7 +59,8 @@
    (num-cuadro :initform 1 :accessor espacio-num-cuadro)
    (animacion-func :initarg :animacion-func :initform nil :accessor espacio-animacion-func)
    (datos :initform (list) :accessor espacio-datos)
-   (jugando :initform nil :accessor espacio-jugando)))
+   (jugando :initform nil :accessor espacio-jugando)
+   (terminar :initform nil :accessor espacio-terminar)))
 
 (defmethod initialize-instance :after ((pane espacio-pane) &key contents)
   (declare (ignore contents))
@@ -124,7 +122,8 @@
     ()
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
     (bt:with-lock-held ((guesp-bloqueo *application-frame*))
-      (setf (espacio-animacion-func espacio) #'spacewar!
+      (setf (espacio-jugando espacio) t
+            (espacio-animacion-func espacio) #'spacewar!
             (espacio-num-cuadro espacio) 1))))
 
 (define-guerra-espacial-command (com-minskytron :name "Minskytron" :menu t)
@@ -144,14 +143,16 @@
     ()
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
     (bt:with-lock-held ((guesp-bloqueo *application-frame*))
-      (setf (espacio-animacion-func espacio) #'munching-squares
+      (setf (espacio-jugando espacio) t
+            (espacio-animacion-func espacio) #'munching-squares
             (espacio-num-cuadro espacio) 1))))
 
 (define-guerra-espacial-command (com-reiniciar :name "Reiniciar" :menu t)
     ()
   (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
     (bt:with-lock-held ((guesp-bloqueo *application-frame*))
-      (setf (espacio-objs espacio) (carga-naves *naves*)
+      (setf (espacio-jugando espacio) t
+            (espacio-objs espacio) (carga-naves *naves*)
             (espacio-num-cuadro espacio) 1
             (espacio-datos espacio) nil)
       (draw-rectangle* (espacio-pixmap espacio) 0 0
@@ -162,7 +163,9 @@
 (define-guerra-espacial-command (com-salir :name "Salir" :menu t)
     ()
   (bt:with-lock-held ((guesp-bloqueo *application-frame*))
-    (frame-exit *application-frame*)))
+    (let ((espacio (find-pane-named *application-frame* 'espacio-pane)))
+      (setf (espacio-terminar espacio) t)
+      (frame-exit *application-frame*))))
 
 
 (defun guerra-espacial-entry-point ()

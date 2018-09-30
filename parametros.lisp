@@ -30,7 +30,6 @@
 (defparameter *min-y* (- (1- *max-y* )))
 
 (declaim (type double-float *desp-x* *pausa*))
-(defparameter *guesp* nil)
 (defparameter *pausa* (/ 40.0d0))
 (defparameter *ruta-del-sistema* (asdf:component-pathname (asdf:find-system 'guerra-espacial)))
 (defparameter *desp-x* (/ (* *pausa* 8192) (* 24 60 60)))
