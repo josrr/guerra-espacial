@@ -155,11 +155,7 @@
       (setf (espacio-jugando espacio) t
             (espacio-objs espacio) (carga-naves *naves*)
             (espacio-num-cuadro espacio) 1
-            (espacio-datos espacio) nil)
-      (draw-rectangle* (espacio-pixmap espacio) 0 0
-                       (bounding-rectangle-width (sheet-region espacio))
-                       (bounding-rectangle-height (sheet-region espacio))
-                       :ink +black+))))
+            (espacio-datos espacio) nil))))
 
 (define-guerra-espacial-command (com-salir :name "Salir" :menu t)
     ()

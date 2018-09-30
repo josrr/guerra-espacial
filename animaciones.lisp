@@ -37,6 +37,8 @@
          (alto (bounding-rectangle-height (sheet-region pane))))
     (let ((pixmap (espacio-pixmap pane)))
       (when pixmap
+        (when (= 1 (espacio-num-cuadro pane))
+          (draw-rectangle* pixmap 0 0 ancho alto :filled t :ink +black+))
         (loop for i from 0 below 1000
               for px = (+ *ancho/2* x) and py = (- *alto/2* y)
               for color = (/ (log (incf (espacio-num-cuadro pane))) 255 10)
