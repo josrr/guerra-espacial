@@ -369,7 +369,7 @@
 
 (defun agrega-control-nave (gadget nombre-nave control)
   (let ((nave (dame-nave gadget nombre-nave)))
-    (bt:with-lock-held ((guesp-bloqueo *guesp*))
+    (bt:with-lock-held ((guesp-bloqueo *application-frame*))
       (push control (getf nave :controles)))))
 
 (defun quita-control-nave (gadget nombre-nave control)
