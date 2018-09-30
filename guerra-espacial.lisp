@@ -103,7 +103,8 @@
         (if accion
             (agrega-control-nave gadget (car accion) (cadr accion))
             (case tecla
-              ((:|Q| :|q|) (execute-frame-command *application-frame* `(com-salir)))
+              ((:|Q| :|q|) (when (espacio-jugando gadget)
+                             (execute-frame-command *application-frame* `(com-salir))))
               ((:|N| :|n|) (execute-frame-command *application-frame* `(com-reiniciar)))
               (t (unless (espacio-jugando gadget)
                    (execute-frame-command *application-frame* `(com-guerra-espacial))))))))))
