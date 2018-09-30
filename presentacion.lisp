@@ -69,21 +69,7 @@
   (copy-from-pixmap (espacio-pixmap pane) 0 0
                     (bounding-rectangle-width (sheet-region pane))
                     (bounding-rectangle-height (sheet-region pane))
-                    pane 0 0)
-  (loop with cuantos double-float = *ms-num-cuadros*
-        with ancho double-float = (min (/ *ancho-df* cuantos) (/ *alto-df* cuantos))
-        with ancho/2 double-float = (/ ancho 2.0d0)
-        for i from 0 below *ms-num-cuadros* and x from ancho/2 by ancho
-        do (loop for j from 0 below *ms-num-cuadros* and y from ancho/2 by ancho
-                 for c = (elt (aref *portada* j) i)
-                 do (draw-circle* pane x y ancho/2 :ink (if (or (char=  #\* c)
-                                                                (< (incf (espacio-num-cuadro pane))
-                                                                   (* 512 (parse-integer (subseq (aref *portada* j) i (1+ i))
-                                                                                         :radix 16))))
-                                                            +darkslategrey+
-                                                            +cyan+)))))
-;;if (char/= #\* (elt (aref *portada* j) i)) do (draw-point* pane x y :ink +white+ :line-thickness (+ 4 (random 4)))
-
+                    pane 0 0))
 
 (defun presentacion (pane)
   (loop repeat *ms-num-cuadros* do
@@ -95,5 +81,18 @@
   (let ((pixmap (espacio-pixmap pane))
         (ancho (bounding-rectangle-width (sheet-region pane)))
         (alto (bounding-rectangle-height (sheet-region pane))))
+    (loop repeat 16 do
+      (loop with cuantos double-float = *ms-num-cuadros*
+            with ancho double-float = (min (/ *ancho-df* cuantos) (/ *alto-df* cuantos))
+            with ancho/2 double-float = (/ ancho 2.0d0)
+            for i from 0 below *ms-num-cuadros* and x from ancho/2 by ancho
+            do (loop for j from 0 below *ms-num-cuadros* and y from ancho/2 by ancho
+                     for c = (elt (aref *portada* j) i)
+                     do (draw-circle* pane x y ancho/2 :ink (if (or (char=  #\* c)
+                                                                    (< (incf (espacio-num-cuadro pane))
+                                                                       (* 512 (parse-integer (subseq (aref *portada* j) i (1+ i))
+                                                                                             :radix 16))))
+                                                                +darkslategrey+
+                                                                +cyan+)))))
     (copy-to-pixmap pane 0 0 ancho alto pixmap 0 0)
     (setf (espacio-animacion-func pane) #'instrucciones)))
