@@ -21,7 +21,7 @@
         for x from 0 to cuantos-1 and xmed double-float from ancho/2 by ancho do
           (loop for y from 0 to cuantos-1 and ymed double-float from ancho/2 by ancho
                 if (< (logxor x y) num-cuadro) do
-                  (draw-point* pane xmed ymed :ink +cyan+ :line-thickness ancho)
+                  (draw-point* pane xmed ymed :ink +darkslategrey+ :line-thickness ancho)
                   (incf cuantos-si))
         finally (if (>= cuantos-si total)
                     (setf (espacio-num-cuadro pane) 1)
